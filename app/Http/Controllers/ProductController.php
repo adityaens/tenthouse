@@ -14,8 +14,9 @@ class ProductController extends Controller
         return view('admin.products.create');
     }
 
-    public function store(){
-        return 'ererrr';
+    public function store(Request $request){
+    
+       dd($request);
     }
 
 }

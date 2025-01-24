@@ -36,7 +36,7 @@
                             </button>
                         </div>
                     </div>
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" style="margin: 20px;">
     @csrf
     <div class="form-group">
         <label for="inputName">Product Name</label>
