@@ -27,12 +27,11 @@
         <div class="content">
             <div class="container-fluid">
                 @include('components.alert')
-                {{-- <div class="d-flex justify-content-between mt-4">
-                    <h1>Customer List</h1>
-                    <button type="button" onclick="window.location.href='{{ route('admin.add.customer') }}'"
-                        class="btn btn-primary sb-sidenav-dark border-0 text-white cust--btn">Add Customer</button>
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" onclick="window.location.href='{{ route('admin.products.create') }}'"
+                        class="btn btn-primary sb-sidenav-dark border-0 text-white cust--btn">Add</button>
                 </div>
-                <ol class="breadcrumb mb-4">
+                {{--<ol class="breadcrumb mb-4">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">Customer List </li>
                 </ol> --}}
