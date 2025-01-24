@@ -31,4 +31,6 @@ return [
      * Pagination links on each side of current page
      */
     'pagination_links_each_side' => env('PAGINATION_LINKS_EACH_SIDE', 1),
+
+    'debug_mode' => env('DEBUG_MODE', false),
 ];

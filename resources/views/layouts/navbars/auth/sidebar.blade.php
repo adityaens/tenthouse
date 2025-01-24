@@ -3,7 +3,7 @@
     <!-- Brand Logo -->
     <a href="{{ route('dashboard.index') }}" class="brand-link">
       <img src="{{ asset('assets/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Tent House</span>
+      <span class="brand-text font-weight-light">TentHouse</span>
     </a>
 
     <!-- Sidebar -->
@@ -56,22 +56,40 @@
                   <p>Add</p>
                 </a>
               </li>
-              <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inactive Page</p>
-                </a>
-              </li> -->
             </ul>
           </li>
+
           <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Product Categories
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{route('admin.products.index')}}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('admin.products.create')}}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Simple Link
               </p>
             </a>
-          </li>
+          </li> -->
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

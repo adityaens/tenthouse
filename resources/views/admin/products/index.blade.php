@@ -1,6 +1,6 @@
 @extends('layouts.user_type.auth')
 
-@section('page_title', __('products list'))
+@section('page_title', __('Products List'))
 
 @section('content')
 
@@ -27,6 +27,7 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
+        @include('components.alert')
         <div class="row">
             <div class="col">
                 
