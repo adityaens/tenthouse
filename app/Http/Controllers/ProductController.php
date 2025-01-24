@@ -19,7 +19,29 @@ class ProductController extends Controller
 
     public function index()
     {
-        return view('admin.products.index');
+        $products = Product::select([
+            'id',
+            'name',
+            'user_id',
+            'cat_id',
+            'price',
+            'quantity',
+            'status',
+            'created_at'
+        ])
+        ->with('user', function($query) {
+            $query->select('userId', 'name');
+        })
+        ->with('images', function($query) {
+            $query->select('product_id', 'image_path');
+        })
+        // ->with('category', function($query) {
+        //     $query->select('name');
+        // })
+        ->orderBy('id', 'DESC')
+        ->paginate(PER_PAGE);
+
+        return view('admin.products.index', compact('products'));
     }
 
     public function create()

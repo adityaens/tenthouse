@@ -30,4 +30,19 @@ class Product extends Model
         'product_condition',
         'status',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'userId');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id', 'id');
+    }
+
+    // public function category()
+    // {
+    //     return $this->belongsTo(ProductCategory::class, 'user_id', 'userId');
+    // }
 }
