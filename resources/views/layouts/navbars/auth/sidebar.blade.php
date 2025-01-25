@@ -69,13 +69,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('admin.products.index')}}" class="nav-link">
+                <a href="{{route('admin.products.category.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('admin.products.create')}}" class="nav-link">
+                <a href="{{route('admin.products.category.create')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add</p>
                 </a>
