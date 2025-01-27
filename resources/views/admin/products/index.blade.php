@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('page_title', __('Products List'))
-
+ 
 @section('content')
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
@@ -137,7 +137,7 @@
                                                 </a>
 
                                                 <!-- Delete Button -->
-                                                <form action="" method="POST" style="display: inline-block;"
+                                                <form action="{{route('admin.products.destroy',['id' => $product->id])}}" method="POST" style="display: inline-block;"
                                                     onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                     @csrf
                                                     @method('DELETE')

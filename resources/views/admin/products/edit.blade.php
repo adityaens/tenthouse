@@ -3,7 +3,7 @@
 @section('page_title', __('Edit Product'))
 
 @section('content')
-
+ 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header -->
@@ -11,7 +11,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Add Product</h1>
+                        <h1 class="m-0">Edit Product</h1>
                     </div><!-- /.col -->
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -24,12 +24,13 @@
         </div>
         <!-- /.content-header -->
         <section class="content">
+        @include('components.alert')
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-primary">
 
                     <div class="card-body">
-                        <form action="{{ route('admin.products.update') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.products.update', ['id' => $product->id]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('put')
 
@@ -53,7 +54,8 @@
                                                 class="form-control custom-select @error('cat_id') is-invalid @enderror">
                                             <option value="">Select Category</option>
                                             @forelse($productCategories as $productCategory)
-                                                <option {{ !empty(($product->category->id) && ($product->category->id == $productCategory->id)) ? 'selected' : '' }} value="{{ $productCategory->id }}">
+                                             <option {{ isset($product->category->id) && $product->category->id == $productCategory->id ? 'selected' : '' }} value="{{ $productCategory->id }}">
+                                             
                                                     {{ $productCategory->name }}
                                                 </option>
                                             @empty
@@ -134,6 +136,7 @@
                                         @enderror
                                     </div>
                                 </div>
+                           
                                 <div class="col-md-8">
                                     <div class="form-group">
                                         <label for="product_images">Image</label>
@@ -146,6 +149,7 @@
                                         @enderror
                                     </div>
                                 </div>
+                               
                             </div>
 
                             <!-- Submit Button -->

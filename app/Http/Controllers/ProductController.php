@@ -16,7 +16,7 @@ class ProductController extends Controller
 
     public function __construct()
     {
-        $this->debugMode = config('constants.debug_mode');    
+        $this->debugMode = config('constants.debug_mode');
     }
 
     public function index(Request $request)
@@ -30,7 +30,7 @@ class ProductController extends Controller
             'id',
             'name'
         ])
-        ->get();
+            ->get();
 
         $query = Product::select([
             'id',
@@ -42,37 +42,37 @@ class ProductController extends Controller
             'status',
             'created_at'
         ]);
-        
+
         // Apply filters conditionally
         if (!empty($searchName)) {
             $query->where('name', 'like', '%' . $searchName . '%');
         }
-        
+
         if (!empty($searchCatId)) {
             $query->where('cat_id', $searchCatId);
         }
-        
+
         if (isset($searchStatus)) {
             $query->where('status', $searchStatus);
         }
-        
+
         if (!empty($searchCreatedAt)) {
             $query->whereDate('created_at', $searchCreatedAt);
         }
-        
+
         // Add relationships
-        $query->with('user', function($query) {
+        $query->with('user', function ($query) {
             $query->select('userId', 'name');
         });
-        
-        $query->with('images', function($query) {
+
+        $query->with('images', function ($query) {
             $query->select('product_id', 'image_path');
         });
-        
-        $query->with('category', function($query) {
+
+        $query->with('category', function ($query) {
             $query->select('id', 'name');
         });
-        
+
         $products = $query->orderBy('id', 'DESC')->paginate(PER_PAGE);
 
         return view('admin.products.index', [
@@ -87,8 +87,8 @@ class ProductController extends Controller
             'id',
             'name'
         ])
-        ->where('cat_status', 1)
-        ->get();
+            ->where('cat_status', 1)
+            ->get();
 
         return view('admin.products.create', [
             'productCategories' => $productCategories
@@ -124,14 +124,14 @@ class ProductController extends Controller
 
             $productImages = $request->file('product_images');
             if (is_array($productImages) && count($productImages) > 0) {
-                $uploadedFiles = uploadMultipleFiles($productImages); 
+                $uploadedFiles = uploadMultipleFiles($productImages);
                 if (!$uploadedFiles) {
                     return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Images not uploaded.'));
                 }
 
                 foreach ($uploadedFiles as $filePath) {
                     $productImage = new ProductImage();
-                    $productImage->product_id = $product->id; 
+                    $productImage->product_id = $product->id;
                     $productImage->image_path = $filePath;
                     $productImage->save();
                 }
@@ -148,15 +148,16 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        if(!empty($id)) {
+
+        if (!empty($id)) {
             $product = Product::find($id);
 
             $productCategories = ProductCategory::select([
                 'id',
                 'name'
             ])
-            ->where('cat_status', 1)
-            ->get();
+                ->where('cat_status', 1)
+                ->get();
 
             return view('admin.products.edit', [
                 'product' => $product,
@@ -167,7 +168,7 @@ class ProductController extends Controller
         return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Id not found'));
     }
 
-     /**
+    /**
      * Update a newly created product in storage.
      * 
      * @param \App\Http\Requests\ProductRequest $request
@@ -177,35 +178,38 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, $id)
     {
+
+
         $isUpdated = false;
 
-        if(empty($id)) {
+        if (empty($id)) {
             return redirect()->route('admin.products.index')->with('error', showErrorMessage($this->debugMode, 'Id not found'));
         }
 
         try {
             $product = Product::find($id);
-            if($request->has('name')) {
+            if ($request->has('name')) {
                 $product->name = $request->input('name');
             }
-            if($request->has('cat_id')) {
+            if ($request->has('cat_id')) {
                 $product->cat_id = $request->input('cat_id');
             }
-            if($request->has('description')) {
+            if ($request->has('description')) {
                 $product->description = $request->input('description');
             }
-            if($request->has('price')) {
+            if ($request->has('price')) {
                 $product->price = $request->input('price');
             }
-            if($request->has('quantity')) {  
+            if ($request->has('quantity')) {
                 $product->quantity = $request->input('quantity');
             }
-            if($request->has('status')) {
+            if ($request->has('status')) {
                 $product->status = $request->input('status');
             }
-            if($request->has('product_condition')) {
+            if ($request->has('product_condition')) {
                 $product->product_condition = $request->input('product_condition');
             }
+
             $isUpdated = $product->update();
 
             if (!$isUpdated) {
@@ -214,36 +218,73 @@ class ProductController extends Controller
 
             $productImages = $request->file('product_images');
             if (is_array($productImages) && count($productImages) > 0) {
+                // deleting existing records from the table and removing respective image
+                $dbProductImages = ProductImage::where('product_id', $id)->get();
+
+                if ($dbProductImages->isNotEmpty()) {
+
+                    foreach ($dbProductImages as $image) {
+                        $filePath = public_path($image->image_path);
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                }
+
+
                 $deleteOldImages = ProductImage::where('product_id', $id)->delete();
 
-                // if (File::exists($filePath)) {
-                //     File::delete($filePath);
-                //     echo "File deleted successfully!";
-                // } 
-
-                if($deleteOldImages) {
-                    $uploadedFiles = uploadMultipleFiles($productImages); 
-                    if (!$uploadedFiles) {
-                        return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Images not uploaded.'));
-                    }
-
-                    foreach ($uploadedFiles as $filePath) {
-                        $productImage = new ProductImage();
-                        $productImage->product_id = $product->id; 
-                        $productImage->image_path = $filePath;
-                        $productImage->save();
-                    }
-                } else {
-                    return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Old images NOT deleted'));
+                // if($deleteOldImages) {
+                $uploadedFiles = uploadMultipleFiles($productImages);
+                if (!$uploadedFiles) {
+                    return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Images not uploaded.'));
                 }
-                
-            } else {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'No images found'));
-            }
 
-            return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
+                foreach ($uploadedFiles as $filePath) {
+                    $productImage = new ProductImage();
+                    $productImage->product_id = $product->id;
+                    $productImage->image_path = $filePath;
+                    $productImage->save();
+                }
+                // } 
+                // else {
+                //     return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Old images NOT deleted'));
+                // }
+
+            }
+            //else {
+            //     return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'No images found'));
+            // }
+
+            return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
         }
+    }
+    public function destroy($id)
+    {
+
+        if ($id) {
+            // $productDetails = Product::where('id', $id)->first();
+
+            $dbProductImages = ProductImage::where('product_id', $id)->get();
+            if ($dbProductImages->isNotEmpty()) {
+
+                foreach ($dbProductImages as $image) {
+                    $filePath = public_path($image->image_path);
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
+            ProductImage::where('product_id', $id)->delete();
+            Product:: where('id',$id)->delete();
+            return redirect()->route('admin.products.index')->with('success','Product deleted successfully');
+        }else{
+            return redirect()->route('admin.products.index')->with('error','Product not found');
+
+        }
+
+       
     }
 }
