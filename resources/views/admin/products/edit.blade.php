@@ -1,6 +1,6 @@
 @extends('layouts.user_type.auth')
 
-@section('page_title', __('Add Product'))
+@section('page_title', __('Edit Product'))
 
 @section('content')
 
@@ -29,8 +29,9 @@
                     <div class="card card-primary">
 
                     <div class="card-body">
-                        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.products.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @method('put')
 
                             <!-- Row for Name and Category -->
                             <div class="row">
@@ -39,7 +40,7 @@
                                         <label for="name">Name</label>
                                         <input type="text" name="name" id="name" 
                                             class="form-control @error('name') is-invalid @enderror" 
-                                            placeholder="Enter Name" value="{{ old('name') }}">
+                                            placeholder="Enter Name" value="{{ old('name', $product->name) }}">
                                         @error('name')
                                             <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -52,7 +53,7 @@
                                                 class="form-control custom-select @error('cat_id') is-invalid @enderror">
                                             <option value="">Select Category</option>
                                             @forelse($productCategories as $productCategory)
-                                                <option {{ (old('cat_id') == $productCategory->id) ? 'selected' : '' }} value="{{ $productCategory->id }}">
+                                                <option {{ !empty(($product->category->id) && ($product->category->id == $productCategory->id)) ? 'selected' : '' }} value="{{ $productCategory->id }}">
                                                     {{ $productCategory->name }}
                                                 </option>
                                             @empty
@@ -72,7 +73,7 @@
                                         <label for="description">Description</label>
                                         <textarea name="description" id="description" 
                                                 class="form-control @error('description') is-invalid @enderror" 
-                                                rows="4" placeholder="Enter Product Description">{{ old('description') }}</textarea>
+                                                rows="4" placeholder="Enter Product Description">{{ old('description', $product->description) }}</textarea>
                                         @error('description')
                                             <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -87,7 +88,7 @@
                                         <label for="price">Price</label>
                                         <input type="text" name="price" id="price" 
                                             class="form-control @error('price') is-invalid @enderror" 
-                                            placeholder="Enter price in Rs" value="{{ old('price') }}">
+                                            placeholder="Enter price in Rs" value="{{ old('price', $product->price) }}">
                                         @error('price')
                                             <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -98,7 +99,7 @@
                                         <label for="quantity">Quantity</label>
                                         <input type="number" name="quantity" id="quantity" 
                                             class="form-control @error('quantity') is-invalid @enderror" 
-                                            placeholder="Enter Quantity" value="{{ old('quantity') }}">
+                                            placeholder="Enter Quantity" value="{{ old('quantity', $product->quantity) }}">
                                         @error('quantity')
                                             <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -110,8 +111,8 @@
                                         <select name="status" id="status" 
                                                 class="form-control custom-select @error('status') is-invalid @enderror">
                                             <option value="">Select Status</option>
-                                            <option value="1">Active</option>
-                                            <option value="0">Inactive</option>
+                                            <option {{ $product->status == 1 ? 'selected' : '' }}  value="1">Active</option>
+                                            <option {{ $product->status == 0 ? 'selected' : '' }} value="0">Inactive</option>
                                         </select>
                                         @error('status')
                                             <span class="error invalid-feedback">{{ $message }}</span>
@@ -127,7 +128,7 @@
                                         <label for="product_condition">Product Condition</label>
                                         <input type="text" name="product_condition" id="product_condition" 
                                             class="form-control @error('product_condition') is-invalid @enderror" 
-                                            placeholder="Enter Product Condition" value="{{ old('product_condition') }}">
+                                            placeholder="Enter Product Condition" value="{{ old('product_condition', $product->product_condition) }}">
                                         @error('product_condition')
                                             <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -150,7 +151,7 @@
                             <!-- Submit Button -->
                             <div class="row">
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-success">Submit</button>
+                                    <button type="submit" class="btn btn-success">Update</button>
                                 </div>
                             </div>
                         </form>

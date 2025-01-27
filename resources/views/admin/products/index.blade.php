@@ -48,9 +48,9 @@
                                 <div class="row">
                                     <!-- Search by Name -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">{{ __('Search Name') }}</label>
+                                        <label for="name" class="form-label">{{ __('Name') }}</label>
                                         <input type="text" class="form-control" name="name" id="name" 
-                                            placeholder="{{ __('Enter Name') }}" maxlength="150" value="" 
+                                            placeholder="{{ __('Enter Name') }}" maxlength="150" value="{{ request()->get('name') ?? '' }}" 
                                             autocomplete="off">
                                     </div>
 
@@ -59,8 +59,11 @@
                                         <label for="cat_id" class="form-label">{{ __('Category') }}</label>
                                         <select name="cat_id" id="cat_id" class="form-control select2">
                                             <option value="">{{ __('Select Category') }}</option>
-                                            <option value="1">{{ __('Cat 1') }}</option>
-                                            <option value="2">{{ __('Cat 2') }}</option>
+                                            @forelse ($productCategories as $productCategory)
+                                                <option {{ request()->get('cat_id') == $productCategory->id ? 'selected' : '' }} value="{{ $productCategory->id }}">{{ $productCategory->name }}</option>
+                                            @empty
+                                                
+                                            @endforelse
                                         </select>
                                     </div>
                                 </div>
@@ -71,15 +74,15 @@
                                         <label for="status" class="form-label">{{ __('Status') }}</label>
                                         <select name="status" id="status" class="form-control select2">
                                             <option value="">{{ __('Select Status') }}</option>
-                                            <option value="1">{{ __('Active') }}</option>
-                                            <option value="0">{{ __('Inactive') }}</option>
+                                            <option {{ request()->get('status') == 1 ? 'selected' : '' }} value="1">{{ __('Active') }}</option>
+                                            <option {{ request()->get('status') == 0 ? 'selected' : '' }} value="0">{{ __('Inactive') }}</option>
                                         </select>
                                     </div>
 
                                     <!-- Filter by Created On -->
                                     <div class="col-md-6 mb-3">
                                         <label for="created_on" class="form-label">{{ __('Created On') }}</label>
-                                        <input type="date" class="form-control" name="created_on" id="created_on" value="">
+                                        <input type="date" class="form-control" name="created_on" id="created_on" value="{{ request()->get('created_on') ?? '' }}">
                                     </div>
                                 </div>
 
@@ -115,11 +118,11 @@
                                             <td>{{ $product->name ?? '' }}</td>
                                             <td>
                                                 <img src="{{ asset($product->images[0]->image_path ?? '') }}"
-                                                    alt="{{ $product->name }}" width="100">
+                                                    alt="{{ $product->name ?? '' }}" width="100">
                                             </td>
                                             <td>{{ $product->quantity ?? '' }}</td>
                                             <td>{{ $product->price ?? '' }}</td>
-                                            <td></td>
+                                            <td>{{ $product->category->name ?? '' }}</td>
                                             <td>
                                                 <span
                                                     class="p-2 badge {{ $product->status ? 'bg-success' : 'bg-danger' }}">
@@ -129,7 +132,7 @@
                                             <td>{{ date('Y-m-d', strtotime($product->created_at)) }}</td>
                                             <td>
                                                 <!-- Edit Button -->
-                                                <a href="" class="btn btn-sm btn-primary">
+                                                <a href="{{ route('admin.products.edit', ['id' => $product->id]) }}" class="btn btn-sm btn-primary">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
 

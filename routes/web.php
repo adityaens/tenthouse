@@ -35,6 +35,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
         Route::get('/products/add', [ProductController::class, 'create'])->name('admin.products.create');
         Route::post('/products/add', [ProductController::class, 'store'])->name('admin.products.store');
+        Route::get('/products/edit/{id?}', [ProductController::class, 'edit'])->name('admin.products.edit');
+        Route::get('/products/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
 
         // product categories entry
 
