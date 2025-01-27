@@ -45,4 +45,16 @@ public function create(){
             $category->update($data);
              return redirect()->route('admin.products.category.index')->with('success', 'Category updated successfully!');
         }
+
+        public function destroy($id)
+            {
+            // Find the category by ID
+            $category = ProductCategory::findOrFail($id);
+
+            // Delete the category
+            $category->delete();
+
+            // Redirect back with a success message
+            return redirect()->route('admin.products.category.index')->with('success', 'Category deleted successfully!');
+            }
 }

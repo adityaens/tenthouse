@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCateoryController;
+use App\Http\Controllers\PaymentController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -35,13 +36,17 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products/add', [ProductController::class, 'create'])->name('admin.products.create');
         Route::post('/products/add', [ProductController::class, 'store'])->name('admin.products.store');
 
-        // product categories entry 
+        // product categories entry
+
         Route::get('/products/categories/index', [ProductCateoryController::class, 'index'])->name('admin.products.category.index');
         Route::get('/products/categories/create', [ProductCateoryController::class, 'create'])->name('admin.products.category.create');
         Route::post('/products/categories/create', [ProductCateoryController::class, 'store'])->name('admin.products.category.store');
         Route::get('/products/categories/{id}/edit', [ProductCateoryController::class, 'edit'])->name('admin.products.category.edit');
         Route::put('/products/categories/{id}', [ProductCateoryController::class, 'update'])->name('admin.products.category.update');
-      
+        Route::delete('/products/categories/{id}', [ProductCateoryController::class, 'destroy'])->name('admin.products.category.destroy');
+        Route::get('/payment', [PaymentController::class, 'index'])->name('admin.payment.index');
+        Route::get('/payment/create', [PaymentController::class, 'create'])->name('admin.payment.create');
+        Route::post('/payment/create', [PaymentController::class, 'store'])->name('admin.payment.store');
     });
 });
 
