@@ -34,11 +34,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
         Route::get('/products/add', [ProductController::class, 'create'])->name('admin.products.create');
         Route::post('/products/add', [ProductController::class, 'store'])->name('admin.products.store');
-<<<<<<< HEAD
-
-        // Product Categories
-        Route::get('/products/categories', [ProductCateoryController::class, 'index'])->name('admin.products.category.index');
-=======
         // product categories entry 
         Route::get('/products/categories/index', [ProductCateoryController::class, 'index'])->name('admin.products.category.index');
         Route::get('/products/categories/create', [ProductCateoryController::class, 'create'])->name('admin.products.category.create');
@@ -46,7 +41,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products/categories/{id}/edit', [ProductCateoryController::class, 'edit'])->name('admin.products.category.edit');
         Route::put('/products/categories/{id}', [ProductCateoryController::class, 'update'])->name('admin.products.category.update');
       
->>>>>>> a066a46af0a21abd7dd0f2eeb2fdc9405382c60e
     });
 });
 
