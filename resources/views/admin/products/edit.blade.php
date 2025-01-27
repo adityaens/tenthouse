@@ -156,6 +156,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-success">Update</button>
+                                    <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.products.index') }}'">Back</button>
                                 </div>
                             </div>
                         </form>

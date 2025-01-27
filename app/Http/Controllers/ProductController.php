@@ -104,11 +104,12 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request, Product $product)
     {
+        dd($errors->all());
         $isSaved = false;
-
+        
         try {
             $product->name = $request->input('name');
-            $product->user_id = auth()->user()->id;
+            $product->user_id = auth()->user()->userId;
             $product->cat_id = $request->input('cat_id');
             $product->description = $request->input('description');
             $product->price = $request->input('price');
@@ -122,7 +123,9 @@ class ProductController extends Controller
                 return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Product not saved.'));
             }
 
+            
             $productImages = $request->file('product_images');
+           
             if (is_array($productImages) && count($productImages) > 0) {
                 $uploadedFiles = uploadMultipleFiles($productImages);
                 if (!$uploadedFiles) {
@@ -135,9 +138,7 @@ class ProductController extends Controller
                     $productImage->image_path = $filePath;
                     $productImage->save();
                 }
-            } else {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'No images found'));
-            }
+            } 
 
             return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
         } catch (Exception $e) {

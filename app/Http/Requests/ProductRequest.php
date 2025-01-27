@@ -31,8 +31,9 @@ class ProductRequest extends FormRequest
             'quantity' => 'required|numeric|min:0',
             'product_condition' => 'required|string',
             'status' => 'required|boolean',
-            'product_images' => 'array',
-            'product_images.*' => 'image|mimes:jpg,jpeg,png,gif|max:2048',
+            'product_images' => 'nullable|array', 
+            'product_images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120', 
+    
         ];
     }
 
@@ -66,11 +67,10 @@ class ProductRequest extends FormRequest
             'status.required' => 'The status field is required.',
             'status.boolean' => 'The status must be either 0 or 1.',
 
-            // 'product_images.required' => 'At least one image is required.',
+
             'product_images.array' => 'The images field must be an array.',
-            'product_images.*.required' => 'Each image is required.',
             'product_images.*.image' => 'Each file must be a valid image.',
-            'product_images.*.mimes' => 'Images must be of type: jpg, jpeg, png, gif.',
+            'product_images.*.mimes' => 'Images must be of type: jpg, jpeg, png, or gif.',
             'product_images.*.max' => 'Each image must not exceed 2 MB in size.',
         ];
     }
