@@ -37,7 +37,7 @@
                with font-awesome or any other icon font library -->
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <i class="nav-icon fas fa-rug"></i>
               <p>
                 Products
                 <i class="right fas fa-angle-left"></i>
@@ -46,13 +46,13 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{{route('admin.products.index')}}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="far fa-rectangle-list nav-icon"></i>
                   <p>List</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('admin.products.create')}}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                  <i class="far fa-square-plus nav-icon"></i>
                   <p>Add</p>
                 </a>
               </li>
@@ -61,7 +61,7 @@
 
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <i class="nav-icon fas fa-layer-group"></i>
               <p>
                 Product Categories
                 <i class="right fas fa-angle-left"></i>
@@ -69,18 +69,24 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('admin.products.index')}}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                <a href="{{route('admin.products.category.index')}}" class="nav-link">
+                  <i class="far fa-rectangle-list nav-icon"></i>
                   <p>List</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('admin.products.create')}}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
+                <a href="{{route('admin.products.category.create')}}" class="nav-link">
+                  <i class="far fa-square-plus nav-icon"></i>
                   <p>Add</p>
                 </a>
               </li>
             </ul>
+          </li>
+          <li class="nav-item">
+                <a href="{{route('admin.payment.index')}}" class="nav-link">
+                <i class="fa-solid fa-file-invoice-dollar nav-icon"></i>
+                  <p>Payment</p>
+                </a>
           </li>
           <!-- <li class="nav-item">
             <a href="#" class="nav-link">

@@ -1,6 +1,6 @@
 @extends('layouts.user_type.auth')
 
-@section('page_title', __('products list'))
+@section('page_title', __('Payment'))
 
 @section('content')
 
@@ -11,12 +11,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Product Category</h1>
+                    <h1 class="m-0">Product Payment</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">edit</li>
+                        <li class="breadcrumb-item"><a href="#">home</a></li>
+                        <li class="breadcrumb-item active">payment</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -35,20 +35,18 @@
                   <thead>
                     <tr align="center">
                       <th>Sr.No.</th>
-                      <th>Category Name</th>
-                      <th>Status</th>
+                      <th>Payment Mode</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                  @php $sr=1; @endphp
-                  @foreach($categories as $category)
+                   @php $sr=1; @endphp
+                  @foreach($payment as $payments)
                 <tr align="center">
                     <td>{{ $sr }}</td>
-                    <td>{{ $category->name }}</td>
-                    <td>{{ $category->cat_status == 1 ? 'Active' : 'Inactive' }}</td>
-                        <td><a href="{{ route('admin.products.category.edit', $category->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit </a>
-                        <form action="{{ route('admin.products.category.destroy', $category->id) }}" method="POST" style="display:inline-block;">
+                    <td>{{ $payments->pay_mod }}</td>
+                        <td><a href="#" class="btn btn-primary"><i class="fas fa-edit"></i> Edit </a>
+                        <form action="#" method="POST" style="display:inline-block;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
