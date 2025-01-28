@@ -132,7 +132,7 @@
                                 <tr>
                                     <td>{{ $product->name ?? '' }}</td>
                                     <td>
-                                        <img src="{{ asset($product->images[0]->image_path ?? '') }}"
+                                        <img src="{{ asset($product->images[0]->image_path ?? 'assets/img/product_default_img.jpg') }}"
                                             alt="{{ $product->name ?? '' }}" width="100">
                                     </td>
                                     <td>{{ $product->quantity ?? '' }}</td>

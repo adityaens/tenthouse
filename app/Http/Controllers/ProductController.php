@@ -6,9 +6,12 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Http\Requests\ProductRequest;
+use App\Models\ProductLog;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+
 
 class ProductController extends Controller
 {
@@ -104,9 +107,9 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request, Product $product)
     {
-       
+
         $isSaved = false;
-        
+
         try {
             $product->name = $request->input('name');
             $product->user_id = auth()->user()->userId;
@@ -123,9 +126,9 @@ class ProductController extends Controller
                 return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Product not saved.'));
             }
 
-            
+
             $productImages = $request->file('product_images');
-           
+
             if (is_array($productImages) && count($productImages) > 0) {
                 $uploadedFiles = uploadMultipleFiles($productImages);
                 if (!$uploadedFiles) {
@@ -138,8 +141,11 @@ class ProductController extends Controller
                     $productImage->image_path = $filePath;
                     $productImage->save();
                 }
-            } 
+            }
 
+            if ($isSaved) {
+                $this->product_logs($product->id, 'add', null, $product->toArray(), 'Product added successfully.');
+            }
             return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
@@ -257,6 +263,12 @@ class ProductController extends Controller
             //     return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'No images found'));
             // }
 
+            if ($isUpdated) {
+                $oldValues = $product->getOriginal();
+                $newValues = $product->getChanges();
+                $this->product_logs($product->id, 'update', $oldValues, $newValues, 'Product updated successfully.');
+            }
+
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
@@ -265,9 +277,12 @@ class ProductController extends Controller
     public function destroy($id)
     {
 
-        if ($id) {
-            // $productDetails = Product::where('id', $id)->first();
+        $product = Product::find($id);
+        if ($product) {
+            $this->product_logs($product->id, 'delete', $product->toArray(), null, 'Product deleted successfully.');
+        }
 
+        if ($id) {
             $dbProductImages = ProductImage::where('product_id', $id)->get();
             if ($dbProductImages->isNotEmpty()) {
 
@@ -278,14 +293,32 @@ class ProductController extends Controller
                     }
                 }
             }
+        $product = Product::find($id);
+        if ($product) {
+            $this->product_logs($product->id, 'delete', $product->toArray(), null, 'Product deleted successfully.');
             ProductImage::where('product_id', $id)->delete();
-            Product:: where('id',$id)->delete();
-            return redirect()->route('admin.products.index')->with('success','Product deleted successfully');
-        }else{
-            return redirect()->route('admin.products.index')->with('error','Product not found');
-
+            $product->delete();
+ 
         }
+            
+            return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully');
+        } else {
+            return redirect()->route('admin.products.index')->with('error', 'Product not found');
+        }
+    }
 
-       
+    private function product_logs($productId, $changeType, $oldValues = null, $newValues = null, $remarks = null)
+    {
+
+        DB::table('product_logs')->insert([
+            'product_id' => $productId,
+            'user_id' => auth()->id(), // Get the authenticated user ID
+            'change_type' => $changeType, // e.g., 'add', 'update', 'delete'
+            'old_values' => $oldValues ? json_encode($oldValues) : null,
+            'new_values' => $newValues ? json_encode($newValues) : null,
+            'remarks' => $remarks,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
