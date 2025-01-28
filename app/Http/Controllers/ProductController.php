@@ -104,7 +104,7 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request, Product $product)
     {
-        dd($errors->all());
+       
         $isSaved = false;
         
         try {

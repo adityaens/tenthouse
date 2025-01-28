@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCateoryController;
@@ -39,6 +40,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
+
+        //Group
+        Route::get('/products/groups', [GroupController::class, 'index'])->name('admin.products.groups.index');
+        Route::get('/products/groups/add', [GroupController::class, 'create'])->name('admin.products.groups.create');
+        Route::post('/products/groups/add', [GroupController::class, 'store'])->name('admin.products.groups.store');
+        Route::get('/products/groups/edit/{id}', [GroupController::class, 'edit'])->name('admin.products.groups.edit');
+        Route::put('/products/groups/update/{id}', [GroupController::class, 'update'])->name('admin.products.groups.update');
+        Route::delete('/products/groups/destroy/{id}', [GroupController::class, 'destroy'])->name('admin.products.groups.destroy');
 
         // product categories entry
 

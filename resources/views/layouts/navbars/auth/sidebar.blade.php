@@ -82,6 +82,31 @@
               </li>
             </ul>
           </li>
+          <!-- group start-->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-layer-group"></i>
+              <p>
+                Groups
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{route('admin.products.groups.index')}}" class="nav-link">
+                  <i class="far fa-rectangle-list nav-icon"></i>
+                  <p>List</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('admin.products.groups.create')}}" class="nav-link">
+                  <i class="far fa-square-plus nav-icon"></i>
+                  <p>Add</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+           <!-- group end -->
           <li class="nav-item">
                 <a href="{{route('admin.payment.index')}}" class="nav-link">
                 <i class="fa-solid fa-file-invoice-dollar nav-icon"></i>
