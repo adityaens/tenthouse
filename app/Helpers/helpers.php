@@ -24,7 +24,7 @@ if (! function_exists('uploadFile')) {
     function uploadFile($file)
     {
         // Generate a random name for the file
-        $randomFileName = \Str::random(40) . '.' . $file->getClientOriginalExtension() . '.' . date('Y-m-d');
+        $randomFileName = \Str::random(40) . '.' . date('Y-m-d') . '.' . $file->getClientOriginalExtension();
 
         // Move the file to the public/uploads directory
         $file->move(public_path('uploads'), $randomFileName);
