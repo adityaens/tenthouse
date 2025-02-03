@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
@@ -31,6 +32,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/loadChangePass', [AdminController::class, 'changePass'])->name('admin.loadChangePass');
         Route::post('/changePassword', [AdminController::class, 'updatePass'])->name('admin.changePassword');
+
+        // User
+        Route::get('/users',[CustomerController::class, 'index'])->name('admin.user.index');
+        Route::get('/users/add', [CustomerController::class, 'create'])->name('admin.user.create');
+        Route::post('/users/add', [CustomerController::class, 'store'])->name('admin.user.store');
+        Route::get('/users/edit/{id}', [CustomerController::class, 'edit'])->name('admin.user.edit');
+        Route::put('/users/update/{id}', [CustomerController::class, 'update'])->name('admin.user.update');
+        Route::delete('/users/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.user.destroy');
 
         // Products entries
         Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
