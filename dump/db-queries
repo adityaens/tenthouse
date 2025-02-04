@@ -15,7 +15,7 @@ CREATE TABLE `product_logs` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `product_id` int(20) NOT NULL,
   `user_id` int(20) NOT NULL,
-  `change_type` varchar(255) NOT NULL,
+  `change_type` varchar(255) NOT NULL,  
   `old_values` text DEFAULT NULL,
   `new_values` text DEFAULT NULL,
   `remarks` text DEFAULT NULL,
@@ -34,6 +34,27 @@ CREATE TABLE `groups` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `tbl_users` ADD `address` TEXT NULL AFTER `mobile`;
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `payment_method_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `total_amount` int(11) DEFAULT NULL,
+  `paid_amount` int(11) DEFAULT NULL,
+  `due_amount` int(11) DEFAULT NULL,
+  `due_date` varchar(255) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `delivered_by` varchar(255) DEFAULT NULL,
+  `booking_date_from` varchar(255) DEFAULT NULL,
+  `booking_date_to` varchar(255) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+);
 
 
 ALTER TABLE `orders` CHANGE `order_id` `order_id` VARCHAR(255) NULL DEFAULT NULL;
