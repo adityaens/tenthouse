@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCateoryController;
 use App\Http\Controllers\PaymentController;
@@ -61,6 +62,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/payment', [PaymentController::class, 'index'])->name('admin.payment.index');
         Route::get('/payment/create', [PaymentController::class, 'create'])->name('admin.payment.create');
         Route::post('/payment/create', [PaymentController::class, 'store'])->name('admin.payment.store');
+
+        //Orders
+        Route::get('/orders', [OrdersController::class, 'index'])->name('admin.orders.index');
+        Route::get('/orders/add', [OrdersController::class, 'create'])->name('admin.orders.create');
+        Route::post('/orders/add', [OrdersController::class, 'store'])->name('admin.orders.store');
+        Route::get('/orders/edit/{id}', [OrdersController::class, 'edit'])->name('admin.orders.edit');
+        Route::put('/orders/update/{id}', [OrdersController::class, 'update'])->name('admin.orders.update');
+        Route::delete('/orders/destroy/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
     });
 });
 
