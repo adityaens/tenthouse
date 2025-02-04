@@ -34,6 +34,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/loadChangePass', [AdminController::class, 'changePass'])->name('admin.loadChangePass');
         Route::post('/changePassword', [AdminController::class, 'updatePass'])->name('admin.changePassword');
 
+        // Edit Admin Profile
+        Route::get('/edit_profile',[AdminController::class, 'edit_profile'])->name('admin.edit_profile');
+        Route::put('/update_profile',[AdminController::class, 'update_profile'])->name('admin.update_profile');
+
         // User
         Route::get('/users', [CustomerController::class, 'index'])->name('admin.user.index');
         Route::get('/users/add', [CustomerController::class, 'create'])->name('admin.user.create');
