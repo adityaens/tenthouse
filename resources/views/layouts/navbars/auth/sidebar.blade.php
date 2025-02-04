@@ -48,7 +48,7 @@
            <a href="#" class="nav-link">
              <i class="nav-icon fa-solid fa-user-plus"></i>
              <p>
-               Users
+               Customers
                <i class="right fas fa-angle-left"></i>
              </p>
            </a>

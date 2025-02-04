@@ -153,7 +153,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7"><span class="">No Groups to show</span></td>
+                                    <td colspan="7"><span class="">No Customer to show</span></td>
                                 </tr>
                                 @endforelse
                             </tbody>

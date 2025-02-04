@@ -60,7 +60,7 @@ class CustomerController extends Controller
             'status' => $request->status
         ]);
         if($user){
-            return redirect()->route('admin.user.index')->with('success','User created successfully');
+            return redirect()->route('admin.user.index')->with('success','Customer created successfully');
         }else{
             return redirect()->route('admin.user.index')->with('error','Something went wrong!!');
         }
@@ -83,7 +83,7 @@ class CustomerController extends Controller
             'status' => $request->status
         ]);
         if($user){
-          return redirect()->route('admin.user.index')->with('success','User updated successfully');
+          return redirect()->route('admin.user.index')->with('success','Customer updated successfully');
         }else{
           return redirect()->route('admin.user.index')->with('error','Something went wrong');
         }
@@ -93,7 +93,7 @@ class CustomerController extends Controller
         $user= User::where('roleId',2)->find($id);
         if($user){
           $user->delete();
-          return redirect()->route('admin.user.index')->with('success','User deleted successfully');
+          return redirect()->route('admin.user.index')->with('success','Customer deleted successfully');
         }
         return redirect()->route('admin.user.index')->with('error','Something went wrong');
   
