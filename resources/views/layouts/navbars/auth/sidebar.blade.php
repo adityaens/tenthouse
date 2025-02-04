@@ -14,7 +14,7 @@
          <img src="{{ asset('assets/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
        </div>
        <div class="info">
-         <a href="#" class="d-block">{{ auth()->user()->name }}</a>
+         <a href="#" class="d-block">{{ auth()->user()->name ?? 'John Doe' }}</a>
        </div>
      </div>
 
@@ -36,6 +36,14 @@
          <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
          <!-- User start-->
+         <li class="nav-item">
+           <a href="{{ route('dashboard.index') }}" class="nav-link">
+             <i class="nav-icon fa-solid fa-table-columns"></i>
+             <p>
+               Dashboard
+             </p>
+           </a>
+         </li>
          <li class="nav-item">
            <a href="#" class="nav-link">
              <i class="nav-icon fa-solid fa-user-plus"></i>
@@ -62,7 +70,7 @@
          <!-- User end -->
          <li class="nav-item">
            <a href="#" class="nav-link">
-            <i class="nav-icon fa-solid fa-couch"></i>
+             <i class="nav-icon fa-solid fa-couch"></i>
              <p>
                Products
                <i class="right fas fa-angle-left"></i>

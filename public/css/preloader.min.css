@@ -1,0 +1,56 @@
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    /* Translucent white */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    /* Optional: adds a slight blur effect */
+}
+
+/* Improved Spinner Style */
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 8px solid rgba(52, 152, 219, 0.2);
+    /* Lighter border */
+    border-top: 8px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    animation: spin 1s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Fade-out transition for the preloader */
+.fade-out {
+    transition: opacity 0.5s ease;
+    opacity: 0;
+}
+
+/* Optional: Basic styling for the page content */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+}
+
+#content {
+    padding: 20px;
+}
