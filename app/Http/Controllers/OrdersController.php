@@ -40,7 +40,7 @@ class OrdersController extends Controller
 
         $products = Product::select([
             'id',
-            'name'
+            'name',
         ])
             ->where('status', ACTIVE)
             ->get();
@@ -109,9 +109,11 @@ class OrdersController extends Controller
 
         $products = Product::select([
             'id',
-            'name'
+            'name',
+            'rem_qty'
         ])
             ->where('status', ACTIVE)
+            ->where('rem_qty', '>', 0)
             ->get();
 
         $paymentMethods = PaymentModel::select([
@@ -177,8 +179,25 @@ class OrdersController extends Controller
                 'remarks' => $request->input('remarks', '')
             ]);
 
+            
+            $product = Product::find($request->input('product'));
+            $quantity = $product->quantity ?? 0;
+            $usedQty = $request->input('quantity') ?? 0;
+            $remQty = $quantity - $usedQty;
+            if($remQty < 0) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order created but not product.'));
+            }
+            $product->used_qty = $request->input('quantity');
+            $product->rem_qty = $remQty;
+
             if ($order->save()) {
-                return redirect()->route('admin.orders.index')->with('success', 'Order created successfully');
+                $isUpdate = $product->update();
+
+                if($isUpdate) {
+                    return redirect()->route('admin.orders.index')->with('success', 'Order created successfully');
+                } else {
+                    return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order created but not product.'));
+                }
             }
 
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order NOT created.'));
@@ -205,9 +224,11 @@ class OrdersController extends Controller
 
             $products = Product::select([
                 'id',
-                'name'
+                'name',
+                'rem_qty'
             ])
                 ->where('status', ACTIVE)
+                ->where('rem_qty', '>', 0)
                 ->get();
 
             $paymentMethods = PaymentModel::select([

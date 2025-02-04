@@ -61,3 +61,6 @@ ALTER TABLE `orders` CHANGE `order_id` `order_id` VARCHAR(255) NULL DEFAULT NULL
 
 ALTER TABLE `orders` CHANGE `due_amount` `due_amount` FLOAT(11) NULL DEFAULT NULL;
 
+ALTER TABLE `products` ADD `used_qty` INT NULL DEFAULT NULL AFTER `quantity`;
+ALTER TABLE `products` ADD `rem_qty` INT NULL DEFAULT NULL AFTER `used_qty`;
+

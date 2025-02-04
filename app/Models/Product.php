@@ -16,6 +16,8 @@ class Product extends Model
         'description',
         'price',
         'quantity',
+        'used_qty',
+        'rem_qty',
         'product_condition',
         'status',
     ];
@@ -27,6 +29,8 @@ class Product extends Model
         'description',
         'price',
         'quantity',
+        'used_qty',
+        'rem_qty',
         'product_condition',
         'status',
     ];

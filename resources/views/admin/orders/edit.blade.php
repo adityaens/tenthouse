@@ -61,7 +61,7 @@
                                             <option value="">Select</option>
                                             @forelse($products as $product)
                                             <option {{ ($order->product_id == $product->id) ? 'selected' : '' }} value="{{ $product->id }}">
-                                                {{ $product->name }}
+                                                {{ $product->name }} ( Rem: {{ $product->rem_qty }} )
                                             </option>
                                             @empty
                                             @endforelse

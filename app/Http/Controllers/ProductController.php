@@ -117,6 +117,8 @@ class ProductController extends Controller
             $product->description = $request->input('description');
             $product->price = $request->input('price');
             $product->quantity = $request->input('quantity');
+            $product->used_qty = 0;
+            $product->rem_qty = $request->input('quantity');
             $product->status = $request->input('status');
             $product->product_condition = $request->input('product_condition');
 
