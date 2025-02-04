@@ -174,11 +174,11 @@
                                         </form>
                                     </td>
                                 </tr>
+                                @php $i++; @endphp
                                 @empty
                                 <tr>
                                     <td colspan="10"><span class="">No Orders to show</span></td>
                                 </tr>
-                                @php $i++; @endphp
                                 @endforelse
                             </tbody>
                         </table>

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class OrdersController extends Controller
 {
@@ -143,6 +144,7 @@ class OrdersController extends Controller
 
             $order = new Order();
             $order->fill([
+                'order_id' => $this->generateUniqueOrderId(),
                 'user_id' => $request->input('customer'),
                 'product_id' => $request->input('product'),
                 'payment_method_id' => $request->input('payment_method'),
@@ -166,30 +168,6 @@ class OrdersController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
         }
-    }
-
-    /**
-     * Function to handle booking date range parsing
-     */
-    private function parseBookingDateRange($bookingDateRange)
-    {
-        $dates = explode(' - ', $bookingDateRange);
-        return [
-            'start' => $dates[0] ?? null,
-            'end' => $dates[1] ?? null
-        ];
-    }
-
-    /**
-     * Function to calculate due amount
-     */
-    private function calculateAmountDetails($totalAmount, $paidAmount)
-    {
-        $totalAmount = floatval($totalAmount);
-        $paidAmount = floatval($paidAmount);
-        $dueAmount = ($totalAmount > $paidAmount) ? ($totalAmount - $paidAmount) : 0;
-
-        return [$totalAmount, $paidAmount, $dueAmount];
     }
 
     public function edit($id)
@@ -260,6 +238,8 @@ class OrdersController extends Controller
 
         try {
             $order = Order::find($id);
+            $oldData = $this->getOrderLogDataArray($order);
+
             if ($request->has('payment_method')) {
                 $order->payment_method_id = $request->input('payment_method');
             }
@@ -270,13 +250,13 @@ class OrdersController extends Controller
                 $order->booking_date_from = $dates['start'];
                 $order->booking_date_to = $dates['end'];
             }
-            if ($totalAmount) {
+            if (isset($totalAmount)) {
                 $order->total_amount = $totalAmount;
             }
-            if ($paidAmount) {
+            if (isset($paidAmount)) {
                 $order->paid_amount = $paidAmount;
             }
-            if ($dueAmount) {
+            if (isset($dueAmount)) {
                 $order->due_amount = $dueAmount;
             }
             if ($request->has('due_date')) {
@@ -299,7 +279,8 @@ class OrdersController extends Controller
             }
 
             if ($isUpdated) {
-                // $logs = $this->createOrderLogs($id, $oldData, $newData);
+                $newData = $this->getOrderLogDataArray($order);
+                $this->createOrderLogs($id, $oldData, $newData);
             }
 
             return redirect()->route('admin.orders.index')->with('success', 'Product updated successfully.');
@@ -308,18 +289,97 @@ class OrdersController extends Controller
         }
     }
 
-    // private function createOrderLogs($orderId, $oldData = [], $newData = [])
-    // {
-    //     if(empty($orderId)) {
-    //         return false;
-    //     }
+    /**
+     * Delete Order
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id)
+    {
+        $order = Order::find($id);
 
-    //     $createdOrderLog = OrderLog::create([
-    //         'order_id' => $orderId,
-    //         'old_data' => json_encode($oldData),
-    //         'new_data' => json_encode($newData)
-    //     ]);
+        if ($order) {
+            $this->createOrderLogs($order->id, $this->getOrderLogDataArray($order), [
+                'deleted_at' => date('Y-m-d H:i:s') // Corrected format
+            ]);
 
-    //     return $createdOrderLog;
-    // }
+            $order->delete(); // Ensure the order is actually deleted
+
+            return redirect()->back()->with('success', 'Order deleted successfully.');
+        }
+
+        return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Failed to delete order.'));
+    }
+
+
+    /**
+     * Function to handle booking date range parsing
+     */
+    private function parseBookingDateRange($bookingDateRange)
+    {
+        $dates = explode(' - ', $bookingDateRange);
+        return [
+            'start' => $dates[0] ?? null,
+            'end' => $dates[1] ?? null
+        ];
+    }
+
+    /**
+     * Function to calculate due amount
+     */
+    private function calculateAmountDetails($totalAmount, $paidAmount)
+    {
+        $totalAmount = floatval($totalAmount);
+        $paidAmount = floatval($paidAmount);
+        $dueAmount = ($totalAmount > $paidAmount) ? ($totalAmount - $paidAmount) : 0;
+
+        return [$totalAmount, $paidAmount, $dueAmount];
+    }
+
+    private function generateUniqueOrderId()
+    {
+        do {
+            $orderId = strtoupper(Str::random(10)); // Generates a random 10-character uppercase string
+        } while (Order::where('order_id', $orderId)->exists()); // Ensure uniqueness
+
+        return $orderId;
+    }
+
+    private function getOrderLogDataArray($order)
+    {
+        return [
+            'order_id' => $order->order_id ?? '',
+            'user_id' => $order->user_id ?? '',
+            'product_id' => $order->product_id ?? '',
+            'payment_method_id' => $order->payment_method_id ?? '',
+            'quantity' => $order->quantity ?? '',
+            'total_amount' => $order->total_amount ?? '',
+            'paid_amount' => $order->paid_amount ?? '',
+            'due_amount' => $order->due_amount ?? '',
+            'due_date' => $order->due_date ?? '',
+            'status' => $order->status ?? '',
+            'delivered_by' => $order->delivered_by ?? '',
+            'booking_date_from' => $order->booking_date_from ?? '',
+            'booking_date_to' => $order->booking_date_to ?? '',
+            'remarks' => $order->remarks ?? '',
+            'created_at' => $order->created_at ?? '',
+            'updated_at' => $order->updated_at ?? ''
+        ];
+    }
+
+    private function createOrderLogs($orderId, $oldData = [], $newData = [])
+    {
+        if ((count($oldData) <= 0) || (count($newData) <= 0) || empty($orderId)) {
+            return false;
+        }
+
+        $createdOrderLog = OrderLog::create([
+            'order_id' => $orderId,
+            'old_data' => json_encode($oldData),
+            'new_data' => json_encode($newData)
+        ]);
+
+        return $createdOrderLog;
+    }
 }
