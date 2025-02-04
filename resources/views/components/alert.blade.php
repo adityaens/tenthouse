@@ -1,5 +1,5 @@
 @if (session('error'))
-<div class="alert alert-danger alert-dismissible" id="alert-danger" role="alert">
+<div class="alert alert-danger alert-dismissible fade show" id="alert-danger" role="alert">
     <span class="alert-text">
         {{ session('error') }}
     </span>
@@ -8,7 +8,7 @@
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible" id="alert-success" role="alert">
+    <div class="alert alert-success alert-dismissible fade show" id="alert-success" role="alert">
         <span class="alert-text">
             {{ session('success') }}
         </span>
