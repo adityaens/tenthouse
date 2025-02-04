@@ -9,7 +9,7 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCateoryController;
 use App\Http\Controllers\PaymentController;
- 
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,11 +34,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/loadChangePass', [AdminController::class, 'changePass'])->name('admin.loadChangePass');
         Route::post('/changePassword', [AdminController::class, 'updatePass'])->name('admin.changePassword');
 
+        // Edit Admin Profile
+        Route::get('/edit_profile',[AdminController::class, 'edit_profile'])->name('admin.edit_profile');
+        Route::put('/update_profile',[AdminController::class, 'update_profile'])->name('admin.update_profile');
+
         // edit admin profile
         Route::get('/edit_profile',[AdminController::class, 'edit_profile'])->name('admin.edit_profile');
         Route::put('/update_profile',[AdminController::class, 'update_profile'])->name('admin.update_profile');
         // User
-        Route::get('/users',[CustomerController::class, 'index'])->name('admin.user.index');
+        Route::get('/users', [CustomerController::class, 'index'])->name('admin.user.index');
         Route::get('/users/add', [CustomerController::class, 'create'])->name('admin.user.create');
         Route::post('/users/add', [CustomerController::class, 'store'])->name('admin.user.store');
         Route::get('/users/edit/{id}', [CustomerController::class, 'edit'])->name('admin.user.edit');
@@ -63,7 +67,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/products/groups/destroy/{id}', [GroupController::class, 'destroy'])->name('admin.products.groups.destroy');
 
         // product categories entry
-
         Route::get('/products/categories/index', [ProductCateoryController::class, 'index'])->name('admin.products.category.index');
         Route::get('/products/categories/create', [ProductCateoryController::class, 'create'])->name('admin.products.category.create');
         Route::post('/products/categories/create', [ProductCateoryController::class, 'store'])->name('admin.products.category.store');

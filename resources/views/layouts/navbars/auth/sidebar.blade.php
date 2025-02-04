@@ -112,7 +112,7 @@
            <a href="#" class="nav-link">
              <i class="nav-icon fa-solid fa-tag"></i>
              <p>
-               Groups
+               Discount Groups
                <i class="right fas fa-angle-left"></i>
              </p>
            </a>
