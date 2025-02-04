@@ -54,6 +54,7 @@ class OrdersController extends Controller
             'total_amount',
             'paid_amount',
             'due_amount',
+            'delivered_by',
             'status',
             'created_at'
         ]);
@@ -170,7 +171,7 @@ class OrdersController extends Controller
                 'due_amount' => $dueAmount,
                 'due_date' => $request->input('due_date'),
                 'status' => (int)$request->input('status'),
-                'delivered_by' => (int)$request->input('delivered_by'),
+                'delivered_by' => $request->input('delivered_by'),
                 'booking_date_from' => $dates['start'],
                 'booking_date_to' => $dates['end'],
                 'remarks' => $request->input('remarks', '')
