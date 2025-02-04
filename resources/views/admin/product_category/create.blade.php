@@ -52,7 +52,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <a href="#" class="btn btn-secondary">Back</a>
+                                <a href="{{ route('admin.products.category.index') }}" class="btn btn-secondary">Back</a>
                             </div>
                         </div>
                     </form>

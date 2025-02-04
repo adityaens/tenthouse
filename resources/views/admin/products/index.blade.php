@@ -117,6 +117,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th>S. No.</th>
                                     <th>Name</th>
                                     <th>Image</th>
                                     <th>Qty.</th>
@@ -128,8 +129,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $i = 1; @endphp
                                 @forelse($products as $key => $product)
                                 <tr>
+                                    <td>{{ $i }}</td>
                                     <td>{{ $product->name ?? '' }}</td>
                                     <td>
                                         <img src="{{ asset($product->images[0]->image_path ?? 'assets/img/product_default_img.jpg') }}"
@@ -169,9 +172,10 @@
                                         </form> -->
                                     </td>
                                 </tr>
+                                @php $i++; @endphp
                                 @empty
                                 <tr>
-                                    <td colspan="7"><span class="">No Products to show</span></td>
+                                    <td colspan="9"><span class="">No Products to show</span></td>
                                 </tr>
                                 @endforelse
                             </tbody>
