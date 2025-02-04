@@ -34,6 +34,7 @@ class User extends Authenticatable
         'email',
         'password',
         'mobile',
+        'address',
         'status',
         'isDeleted'
     ];
@@ -187,5 +188,10 @@ class User extends Authenticatable
         $query = $query->get();
 
         return $query->toArray();
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id', 'id');
     }
 }
