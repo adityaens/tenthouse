@@ -294,4 +294,19 @@ class AdminController extends Controller
             return redirect()->route('login')->with('error', 'Something went wrong');
         }
     }
+    public function edit_profile(){
+        $user=auth()->user();
+        return view('admin.admins.edit_profile', compact('user'));
+    }
+    public function update_profile(Request $request){
+        $user=auth()->user();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'mobile' => $request->mobile,
+            'address' => $request->address,
+            'status' => $request->status,
+        ]);
+        return redirect()->back()->with('success','Profile updated successfully');
+    }
 }
