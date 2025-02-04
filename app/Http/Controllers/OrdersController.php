@@ -134,13 +134,29 @@ class OrdersController extends Controller
      */
     public function store(OrderRequest $request)
     {
+        $discount = 0;
         try {
             $dates = $this->parseBookingDateRange($request->input('booking_date_range'));
 
+            $customer = User::where('userId', $request->input('customer'))
+            ->with('group', function($query) {
+                $query->select('id', 'name', 'discount');
+            })
+            ->first();
+
+            if($customer) {
+                $discount = !empty($customer->group->discount) ? $customer->group->discount : 0;
+            }
+
             list($totalAmount, $paidAmount, $dueAmount) = $this->calculateAmountDetails(
                 $request->input('total_amount'),
-                $request->input('paid_amount')
+                $request->input('paid_amount'),
+                $discount
             );
+
+            if($dueAmount < 0) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amount less than Zero'));
+            }
 
             $order = new Order();
             $order->fill([
@@ -149,7 +165,7 @@ class OrdersController extends Controller
                 'product_id' => $request->input('product'),
                 'payment_method_id' => $request->input('payment_method'),
                 'quantity' => $request->input('quantity'),
-                'total_amount' => $totalAmount,
+                'total_amount' => $request->input('total_amount'),
                 'paid_amount' => $paidAmount,
                 'due_amount' => $dueAmount,
                 'due_date' => $request->input('due_date'),
@@ -222,6 +238,7 @@ class OrdersController extends Controller
     {
 
         $isUpdated = false;
+        $discount = 0;
         $oldData = [];
         $newData = [];
 
@@ -231,13 +248,31 @@ class OrdersController extends Controller
 
         $dates = $this->parseBookingDateRange($request->input('booking_date_range'));
 
-        list($totalAmount, $paidAmount, $dueAmount) = $this->calculateAmountDetails(
-            $request->input('total_amount'),
-            $request->input('paid_amount')
-        );
-
         try {
             $order = Order::find($id);
+            $customerId = !empty($order->user_id) ? $order->user_id : 0;
+
+            if(!empty($customerId)) {
+                $customer = User::where('userId', $customerId)
+                ->with('group', function($query) {
+                    $query->select('id', 'name', 'discount');
+                })
+                ->first();
+                if($customer) {
+                    $discount = !empty($customer->group->discount) ? $customer->group->discount : 0;
+                }
+            }
+            
+            list($totalAmount, $paidAmount, $dueAmount) = $this->calculateAmountDetails(
+                $request->input('total_amount'),
+                $request->input('paid_amount'),
+                $discount
+            );
+
+            if($dueAmount < 0) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amunt less than Zero'));
+            }
+
             $oldData = $this->getOrderLogDataArray($order);
 
             if ($request->has('payment_method')) {
@@ -250,8 +285,8 @@ class OrdersController extends Controller
                 $order->booking_date_from = $dates['start'];
                 $order->booking_date_to = $dates['end'];
             }
-            if (isset($totalAmount)) {
-                $order->total_amount = $totalAmount;
+            if ($request->has('total_amount')) {
+                $order->total_amount = $request->input('total_amount');
             }
             if (isset($paidAmount)) {
                 $order->paid_amount = $paidAmount;
@@ -328,14 +363,14 @@ class OrdersController extends Controller
     /**
      * Function to calculate due amount
      */
-    private function calculateAmountDetails($totalAmount, $paidAmount)
+    private function calculateAmountDetails($totalAmount, $paidAmount, $discount)
     {
-        $totalAmount = floatval($totalAmount);
+        $totalAmount = floatval($totalAmount) * (1 - ($discount / 100));
         $paidAmount = floatval($paidAmount);
-        $dueAmount = ($totalAmount > $paidAmount) ? ($totalAmount - $paidAmount) : 0;
-
+        $dueAmount = max($totalAmount - $paidAmount, 0); // Ensures due amount is never negative
+    
         return [$totalAmount, $paidAmount, $dueAmount];
-    }
+    }    
 
     private function generateUniqueOrderId()
     {
