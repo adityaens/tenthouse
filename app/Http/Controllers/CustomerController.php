@@ -57,7 +57,7 @@ class CustomerController extends Controller
             'name' => $request->name,
             'mobile' => $request->mobile,
             'address' => $request->address,
-            'status' => $request->status
+            'status' => $request->status ? $request->status : 1
         ]);
         if($user){
             return redirect()->route('admin.user.index')->with('success','Customer created successfully');

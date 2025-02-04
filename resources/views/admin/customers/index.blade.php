@@ -31,12 +31,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Users List</h1>
+                    <h1 class="m-0">Customers List</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Users</li>
+                        <li class="breadcrumb-item active">Customers</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -91,7 +91,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="created_on" class="form-label">{{ __('Created On') }}</label>
+                                    <label for="created_on" class="form-label">{{ __('Created At') }}</label>
                                     <input type="date" class="form-control" name="created_on" id="created_on"
                                         value="{{ request()->get('created_on') }}">
                                 </div>
@@ -114,7 +114,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Mobile</th>
-                                    <th>Discount</th>
+                                    <th>Discount(%)</th>
                                     <!-- <th>Email</th> -->
                                     <!-- <th>Address</th> -->
                                     <th>Status</th>
