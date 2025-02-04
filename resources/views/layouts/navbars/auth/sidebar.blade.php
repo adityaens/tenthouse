@@ -157,7 +157,7 @@
                </a>
              </li>
              <li class="nav-item">
-               <a href="" class="nav-link">
+               <a href="{{route('admin.payment.create')}}" class="nav-link">
                  <i class="far fa-square-plus nav-icon"></i>
                  <p>Add</p>
                </a>

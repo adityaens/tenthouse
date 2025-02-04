@@ -77,6 +77,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/payment', [PaymentController::class, 'index'])->name('admin.payment.index');
         Route::get('/payment/create', [PaymentController::class, 'create'])->name('admin.payment.create');
         Route::post('/payment/create', [PaymentController::class, 'store'])->name('admin.payment.store');
+        Route::delete('/payment/destroy/{id}', [PaymentController::class, 'destroy'])->name('admin.payment.destroy');
 
         //Orders
         Route::get('/orders', [OrdersController::class, 'index'])->name('admin.orders.index');

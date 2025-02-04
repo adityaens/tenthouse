@@ -3,7 +3,7 @@
 @section('page_title', __('Payment List'))
 
 @section('content')
-
+ 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -26,6 +26,7 @@
 
     <!-- Main content -->
     <div class="content">
+    @include('components.alert')
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
@@ -40,8 +41,8 @@
                                 @enderror
                             </div>
                             <div class="col-sm-6">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                                <a href="#" class="btn btn-secondary">Back</a>
+                                <button type="submit" class="btn btn-primary">Add</button>
+                                <a href="{{route('admin.payment.index')}}" class="btn btn-secondary">Back</a>
                             </div>
                         </div>
                     </form>
