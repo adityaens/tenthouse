@@ -3,6 +3,13 @@
 @section('page_title', __('Add Order'))
 
 @section('content')
+<style>
+    .rem_qty_box,
+    .discount_box {
+        color: #497D74;
+        font-size: 14px;
+    }
+</style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header -->
@@ -29,199 +36,39 @@
                 <div class="card card-primary">
 
                     <div class="card-body">
-                        <form action="{{ route('admin.orders.store') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
+                        <div class="row mb-6 justify-content-center">
+                            <div class="col-md-5">
+                                <label for="product">Customer</label>
+                                <select class="form-control select2 mb-2" id="user">
+                                    <option value="">Select</option>
+                                    @forelse ($customers as $customer)
+                                    <option value="{{ $customer->userId }}">{{ $customer->name }}</option>
+                                    @empty
 
-                            <!-- Row for Name and Category -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="customer">Customer<span class="text-danger">*</span></label>
-                                        <select name="customer" id="customer"
-                                            class="form-control custom-select @error('customer') is-invalid @enderror">
-                                            <option value="">Select</option>
-                                            @forelse($customers as $customer)
-                                            <option {{ (old('customer') == $customer->userId) ? 'selected' : '' }} value="{{ $customer->userId }}">
-                                                {{ $customer->name }}
-                                            </option>
-                                            @empty
-                                            @endforelse
-                                        </select>
-                                        @error('customer')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="product">Product<span class="text-danger">*</span></label>
-                                        <select name="product" id="product"
-                                            class="form-control custom-select @error('product') is-invalid @enderror">
-                                            <option value="">Select</option>
-                                            @forelse($products as $product)
-                                            <option {{ (old('product') == $product->id) ? 'selected' : '' }} value="{{ $product->id }}">
-                                                {{ $product->name }} ( Rem: {{ $product->rem_qty }} )
-                                            </option>
-                                            @empty
-                                            @endforelse
-                                        </select>
-                                        @error('product')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
+                                    @endforelse
+                                </select>
                             </div>
+                            <div class="col-md-5">
+                                <label for="product">Search for a product</label>
+                                <select class="form-control select2" id="product">
+                                    <option value="">Select</option>
+                                    @forelse ($products as $product)
+                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    @empty
 
-                            <!-- Row for Description -->
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="paymentMethod">Payment Method<span class="text-danger">*</span></label>
-                                        <select name="payment_method" id="payment_method"
-                                            class="form-control custom-select @error('payment_method') is-invalid @enderror">
-                                            <option value="">Select</option>
-                                            @forelse($paymentMethods as $paymentMethod)
-                                            <option {{ (old('payment_method') == $paymentMethod->id) ? 'selected' : '' }} value="{{ $paymentMethod->id }}">
-                                                {{ $paymentMethod->pay_mod }}
-                                            </option>
-                                            @empty
-                                            @endforelse
-                                        </select>
-                                        @error('payment_method')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="quantity">Quantity<span class="text-danger">*</span></label>
-                                        <input type="text" name="quantity" id="quantity"
-                                            class="form-control @error('quantity') is-invalid @enderror"
-                                            placeholder="Enter Quantity" value="{{ old('quantity') }}">
-                                        @error('quantity')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="booking_date_range">Booking Date Range<span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="far fa-calendar-alt"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" class="form-control float-right @error('booking_date_range') is-invalid @enderror" id="booking_date_range" name="booking_date_range">
-                                        </div>
-                                        @error('booking_date_range')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
+                                    @endforelse
+                                </select>
                             </div>
+                            <div class="col-md-2">
+                                <label for="product">Quantity</label>
+                                <input type="number" class="form-control mb-2" id="quantity" value="1">
+                                <button class="btn btn-success" id="add_cart_btn">Add to Cart</button>
+                            </div>
+                        </div>
 
-                            <!-- Row for Price, Quantity, and Status -->
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="total_amount">Total Amount<span class="text-danger">*</span></label>
-                                        <input type="text" name="total_amount" id="total_amount"
-                                            class="form-control @error('total_amount') is-invalid @enderror"
-                                            placeholder="Enter total amount in Rs" value="{{ old('total_amount') }}">
-                                        @error('total_amount')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="paid_amount">Paid Amount<span class="text-danger">*</span></label>
-                                        <input type="text" name="paid_amount" id="paid_amount"
-                                            class="form-control @error('paid_amount') is-invalid @enderror"
-                                            placeholder="Enter total amount in Rs" value="{{ old('paid_amount') }}">
-                                        @error('paid_amount')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="due_amount">Due Amount<span class="text-danger">*</span></label>
-                                        <input type="text" name="due_amount" id="due_amount"
-                                            class="form-control @error('due_amount') is-invalid @enderror"
-                                            placeholder="Enter total amount in Rs" value="{{ old('due_amount') }}" readonly>
-                                        @error('due_amount')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="row" id="cart_list">
 
-                            <!-- Row for Condition and Image -->
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="due_date">Due Date<span class="text-danger">*</span></label>
-                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                            <input type="text" class="form-control datetimepicker-input @error('due_date') is-invalid @enderror" data-target="#due_date" id="due_date" name="due_date" placeholder="YYYY-MM-DD" />
-                                            <div class="input-group-append" data-target="#due_date" data-toggle="datetimepicker">
-                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                            </div>
-                                        </div>
-                                        @error('due_date')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="status">Payment Status<span class="text-danger">*</span></label>
-                                        <select name="status" id="status"
-                                            class="form-control custom-select @error('status') is-invalid @enderror">
-                                            <option value="">Select Status</option>
-                                            <option value="{{ COMPLETED }}" {{ old('status') == COMPLETED ? 'selected' : '' }}>Completed</option>
-                                            <option value="{{ PENDNG }}" {{ old('status') == PENDNG ? 'selected' : '' }}>Pending</option>
-                                            <option value="{{ CANCELLED }}" {{ old('status') == CANCELLED ? 'selected' : '' }}>Cancelled</option>
-                                        </select>
-                                        @error('status')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="delivered_by">Delivered By<span class="text-danger">*</span></label>
-                                        <input type="text" name="delivered_by" id="delivered_by"
-                                            class="form-control @error('delivered_by') is-invalid @enderror"
-                                            placeholder="Enter Name" value="{{ old('delivered_by') }}">
-                                        @error('delivered_by')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="remarks">Remarks</label>
-                                        <textarea name="remarks" id="remarks" class="form-control @error('remarks') is-invalid @enderror">{{ old('remarks') }}</textarea>
-                                        @error('remarks')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-success">Submit</button>
-                                    <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.orders.index') }}'">Back</button>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
 
                 </div>
@@ -243,47 +90,83 @@
 <script src="{{ asset('js/daterangepicker.min.js') }}"></script>
 <script src="{{ asset('js/tempusdominus-bootstrap-4.min.js') }}"></script>
 <script>
+    let debugMode = true;
     $(document).ready(function() {
+        let cart = [];
 
-        $('#booking_date_range').daterangepicker({
-            locale: {
-                format: 'YYYY-MM-DD'
+        $('#add_cart_btn').on('click', function() {
+            let userId = $('#user').find(':selected').val();
+            let productId = $('#product').find(':selected').val();
+            let quantity = $('#quantity').val();
+
+            if (debugMode) {
+                console.log('user:'+userId, 'product'+productId, 'qty'+quantity);
+                debugger;
             }
+
+            if (!productId || !userId || !quantity) return;
+
+            createCart(userId, productId, quantity);
         });
 
-        $('#due_date').datetimepicker({
-            format: 'YYYY-MM-DD',
-            icons: {
-                time: 'far fa-clock',
-                date: 'far fa-calendar',
-                up: 'fas fa-chevron-up',
-                down: 'fas fa-chevron-down',
-                previous: 'fas fa-chevron-left',
-                next: 'fas fa-chevron-right',
-                today: 'far fa-calendar-check',
-                clear: 'fas fa-trash',
-                close: 'fas fa-times'
+        function createCart(userId, productId, quantity) {
+            $.ajax({
+                url: "{{ route('admin.carts.addToCart') }}",
+                type: "POST",
+                data: {
+                    userId: userId,
+                    productId: productId,
+                    quantity: quantity
+                },
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                },
+                success: function(response) {
+                    cart.push({
+                        id: response.cart.id,
+                        name: response.cart.product.name,
+                        sku: response.cart.product.sku,
+                        unitPrice: response.cart.product.price,
+                        quantity: response.cart.quantity,
+                        totalPrice: ''
+                    });
+
+                    if (debugMode) {
+                        console.log(cart);
+                        debugger;
+                    }
+
+                    updateCartUI(cart);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseJSON.error);
+                }
+            });
+
+        }
+
+        function updateCartUI(cart) {
+            let cartHtml = "";
+            cart.forEach((item, index) => {
+                cartHtml += `
+                <tr data-id="${item.id}">
+                    <td>${item.name}</td>
+                    <td>${item.sku}</td>
+                    <td>${item.unitPrice}</td>
+                    <td><input type="number" class="form-control quantity" data-index="${index}" value="${item.quantity}" min="1"></td>
+                    <td class="total-price">${item.totalPrice}</td>
+                    <td><button class="btn btn-danger btn-sm remove-item" data-index="${index}">Delete</button></td>    
+                </tr>
+            `;
+            });
+
+            if (debugMode) {
+                console.log(cartHtml);
+                debugger;
             }
-        });
 
-        $('#total_amount, #paid_amount').on('input', updateDueAmount);
-
+            $('#cart_list').html(cartHtml);
+        }
     });
-
-    function updateDueAmount()
-    {
-        let totalAmount = $('#total_amount').val();
-        let paidAmount = $('#paid_amount').val();
-        $('#due_amount').val(calculateDueAmount(totalAmount, paidAmount));
-    }
-
-    function calculateDueAmount(totalAmount, paidAmount)
-    {
-        totalAmount = parseFloat(totalAmount) || 0;
-        paidAmount = parseFloat(paidAmount) || 0;
-
-        return totalAmount >= paidAmount ? totalAmount - paidAmount : 0;
-    }
-
 </script>
 @endsection

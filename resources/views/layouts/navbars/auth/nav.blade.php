@@ -1,40 +1,37 @@
  <!-- Navbar -->
- <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+ <nav class="main-header navbar navbar-expand navbar-light bg-light">
    <!-- Left navbar links -->
    <ul class="navbar-nav">
      <li class="nav-item">
        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
      </li>
-     <!-- <li class="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" class="nav-link">Home</a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Contact</a>
-      </li> -->
    </ul>
 
    <!-- Right navbar links -->
-   <ul class="navbar-nav ml-auto">
+   <ul class="navbar-nav ms-auto">
 
-     <!-- Messages Dropdown Menu -->
+     <!-- Dropdown Menu -->
      <li class="nav-item dropdown">
-       <a class="nav-link" data-toggle="dropdown" href="#">
+       <a class="nav-link" data-bs-toggle="dropdown" href="#">
          <i class="fa-solid fa-square-caret-down"></i>
        </a>
-       <div class="dropdown-menu dropdown-menu-right">
-         <a class="nav-link"  href="{{route('admin.edit_profile')}}">
-           Profile
-         </a>
-
-         <div class="dropdown-divider"></div>
-         <form action="{{ route('admin.logout') }}" method="post">
-           @csrf
-           <button type="submit" class="dropdown-item">LogOut</button>
-         </form>
-       </div>
-       </div>
+       <ul class="dropdown-menu dropdown-menu-end">
+         <li>
+           <a class="dropdown-item" href="{{route('admin.edit_profile')}}">
+             Profile
+           </a>
+         </li>
+         <li><hr class="dropdown-divider"></li>
+         <li>
+           <form action="{{ route('admin.logout') }}" method="post">
+             @csrf
+             <button type="submit" class="dropdown-item">LogOut</button>
+           </form>
+         </li>
+       </ul>
      </li>
 
    </ul>
  </nav>
+
  <!-- /.navbar -->

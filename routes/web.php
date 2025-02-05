@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GroupController;
@@ -86,6 +87,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/orders/edit/{id}', [OrdersController::class, 'edit'])->name('admin.orders.edit');
         Route::put('/orders/update/{id}', [OrdersController::class, 'update'])->name('admin.orders.update');
         Route::delete('/orders/destroy/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
+
+        //Cart
+        Route::post('/carts/add', [CartController::class, 'addToCart'])->name('admin.carts.addToCart');
     });
 });
 
