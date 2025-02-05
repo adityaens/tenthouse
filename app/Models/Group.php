@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
         'name',
         'discount',        
@@ -15,12 +16,6 @@ class Group extends Model
         'status',
     ];
 
-    protected $hidden = [
-        'name',
-        'discount',        
-        'description',       
-        'status',
-    ];
     // public function users()
     // {
     //     return $this->hasMany(User::class, 'group_id', 'id');

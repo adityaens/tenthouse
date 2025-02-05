@@ -6,6 +6,7 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Group;
 use App\Models\Order;
 use App\Models\OrderLog;
+use App\Models\OrderProduct;
 use App\Models\PaymentModel;
 use App\Models\Product;
 use App\Models\User;
@@ -142,74 +143,53 @@ class OrdersController extends Controller
      * @param \App\Http\Requests\OrderRequest;
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(OrderRequest $request)
+    public function store(Request $request)
     {
-        $discount = 0;
         try {
-            $dates = $this->parseBookingDateRange($request->input('booking_date_range'));
-
-            $customer = User::where('userId', $request->input('customer'))
-            ->with('group', function($query) {
-                $query->select('id', 'name', 'discount');
-            })
-            ->first();
-
-            if($customer) {
-                $discount = !empty($customer->group->discount) ? $customer->group->discount : 0;
+            $userId = $request->input('userId');
+            if(!$request->has('userId')) {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'User NOT found.'),
+                ]);
             }
+            
+            $orderProducts = json_decode($request->input('cartItems'), true);
 
-            list($totalAmount, $paidAmount, $dueAmount) = $this->calculateAmountDetails(
-                $request->input('total_amount'),
-                $request->input('paid_amount'),
-                $discount
-            );
-
-            if($dueAmount < 0) {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amount less than Zero'));
-            }
-
-            $order = new Order();
-            $order->fill([
+            $order = Order::create([
                 'order_id' => $this->generateUniqueOrderId(),
-                'user_id' => $request->input('customer'),
-                'product_id' => $request->input('product'),
-                'payment_method_id' => $request->input('payment_method'),
-                'quantity' => $request->input('quantity'),
-                'total_amount' => $request->input('total_amount'),
-                'paid_amount' => $paidAmount,
-                'due_amount' => $dueAmount,
-                'due_date' => $request->input('due_date'),
-                'status' => (int)$request->input('status'),
-                'delivered_by' => $request->input('delivered_by'),
-                'booking_date_from' => $dates['start'],
-                'booking_date_to' => $dates['end'],
-                'remarks' => $request->input('remarks', '')
+                'user_id' => $userId
             ]);
 
-            
-            $product = Product::find($request->input('product'));
-            $quantity = $product->quantity ?? 0;
-            $usedQty = $request->input('quantity') ?? 0;
-            $remQty = $quantity - $usedQty;
-            if($remQty < 0) {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order created but not product.'));
-            }
-            $product->used_qty = $request->input('quantity');
-            $product->rem_qty = $remQty;
-
-            if ($order->save()) {
-                $isUpdate = $product->update();
-
-                if($isUpdate) {
-                    return redirect()->route('admin.orders.index')->with('success', 'Order created successfully');
-                } else {
-                    return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order created but not product.'));
+            if($order) {
+                foreach($orderProducts as $orderProduct) {
+                    OrderProduct::create([
+                        'order_id' => $order->id,
+                        'product_id' => $orderProduct['productId'],
+                        'product_name' => $orderProduct['productName'],
+                        'sku' => $orderProduct['sku'],
+                        'unit_price' => $orderProduct['unitPrice'],
+                        'quantity' => $orderProduct['quantity'],
+                        'total_price' => $orderProduct['totalPrice']
+                    ]);
                 }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Order NOT created.'
+                ]);
             }
 
-            return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order NOT created.'));
+            return response()->json([
+                'success' => true,
+                'orderId' => $order->id,
+                'message' => 'Order created.'
+            ]);
         } catch (Exception $e) {
-            return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 

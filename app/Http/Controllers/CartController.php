@@ -43,11 +43,12 @@ class CartController extends Controller
         }
 
         // Fetch updated cart item with product and user details
-        $cart = Cart::with(['product', 'user'])->find($cart->id);
+        $cart = Cart::with(['product', 'user', 'user.group'])->find($cart->id);
 
         return response()->json([
             'message' => $cart->wasRecentlyCreated ? 'Product added to cart' : 'Cart updated successfully',
-            'cart' => $cart
+            'cart' => $cart,
+            'price' => $cart->price
         ], 200);
     }
 }

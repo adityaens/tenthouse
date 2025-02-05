@@ -12,26 +12,7 @@ class Order extends Model
     public $fillable = [
         'order_id',
         'user_id',
-        'product_id',
         'payment_method_id',
-        'quantity',
-        'total_amount',
-        'paid_amount',
-        'due_amount',
-        'due_date',
-        'status',
-        'delivered_by',
-        'booking_date_from',
-        'booking_date_to',
-        'remarks'
-    ];
-
-    public $hidden = [
-        'order_id',
-        'user_id',
-        'product_id',
-        'payment_method_id',
-        'quantity',
         'total_amount',
         'paid_amount',
         'due_amount',

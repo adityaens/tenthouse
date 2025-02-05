@@ -15,6 +15,11 @@ class Cart extends Model
         'quantity'
     ];
 
+    public function getPriceAttribute()
+    {
+        return $this->quantity * $this->product->price;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'userId');
