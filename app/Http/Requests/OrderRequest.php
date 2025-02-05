@@ -23,7 +23,7 @@ class OrderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules= [
             'customer' => 'required|numeric',
             'product' => 'required|numeric',
             'payment_method' => 'required|numeric',
@@ -35,6 +35,12 @@ class OrderRequest extends FormRequest
             'status' => 'required|numeric',
             'delivered_by' => 'required|string',
         ];
+        
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            $rules['customer'] = '';
+            $rules['product'] = '';
+        }
+        return $rules;
     }
 
     /**

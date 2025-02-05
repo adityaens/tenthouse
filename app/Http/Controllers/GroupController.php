@@ -19,8 +19,7 @@ class GroupController extends Controller
 
     public function index(Request $request)
     {
-        $searchName = $request->get('name', NULL);
-        $searchDiscount = $request->get('discount', NULL);
+        $searchName = $request->get('name', NULL);        
         $searchStatus = $request->get('status', NULL);
         $searchCreatedAt = $request->get('created_at', NULL);
 
@@ -29,7 +28,7 @@ class GroupController extends Controller
         $query = Group::select([
             'id',
             'name',
-            'discount',
+            'description',
             'status',
             'created_at'
         ]);
@@ -38,10 +37,7 @@ class GroupController extends Controller
         if (!empty($searchName)) {
             $query->where('name', 'like', '%' . $searchName . '%');
         }
-
-        if (!empty($searchDiscount)) {
-            $query->where('discount', $searchDiscount);
-        }
+       
 
         if (isset($searchStatus)) {
             $query->where('status', $searchStatus);
@@ -66,10 +62,9 @@ class GroupController extends Controller
         $isSaved = false;
 
         try {
-            $group->name = $request->input('name');
-            $group->discount = $request->input('discount');
-            $group->description = $request->input('description');
-            $group->status = $request->input('status');
+            $group->name = $request->input('name');           
+            $group->description = $request->input('description') ? $request->input('description') : '';
+            $group->status = $request->input('status') ? $request->input('status') : 1; 
 
             $isSaved = $group->save();
 
@@ -92,8 +87,7 @@ class GroupController extends Controller
         $group= Group::find($request->id);
         if($group){
             $group->update([
-                'name' => $request->name,
-                'discount' => $request->discount,
+                'name' => $request->name,                
                 'description' => $request->description,
                 'status' => $request->status,
             ]);

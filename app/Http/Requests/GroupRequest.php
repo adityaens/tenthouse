@@ -24,9 +24,7 @@ class GroupRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'discount' => 'required|numeric|max:100',
-            'status' => 'required',
+            'name' => 'required',            
         ];
     }
 }

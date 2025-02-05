@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 class Product extends Model
 {
@@ -11,6 +13,7 @@ class Product extends Model
     
     protected $fillable = [
         'name',
+        'sku',
         'user_id',
         'cat_id',
         'description',
@@ -24,6 +27,7 @@ class Product extends Model
 
     protected $hidden = [
         'name',
+        'sku',
         'user_id',
         'cat_id',
         'description',
@@ -48,5 +52,22 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'cat_id', 'id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            $product->sku = self::generateSKU($product);
+        });
+    }
+
+    // Generate a unique SKU
+    public static function generateSKU($product)
+    {
+
+        return strtoupper(Str::random(3)) . '-' . strtoupper(Str::random(4)) . '-' . Str::random(3);
+       
     }
 }

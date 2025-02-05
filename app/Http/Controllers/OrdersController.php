@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
+use App\Models\Group;
 use App\Models\Order;
 use App\Models\OrderLog;
 use App\Models\PaymentModel;
 use App\Models\Product;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 use Illuminate\Support\Str;
+
 
 class OrdersController extends Controller
 {
@@ -214,14 +216,17 @@ class OrdersController extends Controller
 
             $customers = User::select([
                 'userId',
-                'name'
+                'name',
+                'group_id'
             ])
                 ->where([
                     'roleId' => 2,
                     'status' => ACTIVE
                 ])
                 ->get();
-
+           
+            $discount= Group::where('id',$customers[0]->group_id)->select('discount')->first();
+           
             $products = Product::select([
                 'id',
                 'name',
@@ -240,6 +245,7 @@ class OrdersController extends Controller
             return view('admin.orders.edit', [
                 'order' => $order,
                 'customers' => $customers,
+                'discount' => $discount,
                 'products' => $products,
                 'paymentMethods' => $paymentMethods
             ]);
@@ -292,7 +298,7 @@ class OrdersController extends Controller
             );
 
             if($dueAmount < 0) {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amunt less than Zero'));
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amount less than Zero'));
             }
 
             $oldData = $this->getOrderLogDataArray($order);

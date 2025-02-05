@@ -49,10 +49,7 @@
             </div>
             
             <div class="card mb-4">
-                <!-- <div class="card-header">
-                            <i class="fas fa-table me-1"></i>
-                            Customer User List
-                        </div> -->
+               {{--
                 <div class="card-body">
 
                     <div class="filter-form-wrapper mb-5">
@@ -66,12 +63,7 @@
                                         placeholder="{{ __('Enter Name') }}" maxlength="150" value="{{ request()->get('name') ?? '' }}"
                                         autocomplete="off">
                                 </div>  
-                                <div class="col-md-6 mb-3">
-                                    <label for="discount" class="form-label">{{ __('Discount(%)') }}</label>
-                                    <input type="text" class="form-control" name="discount" id="discount"
-                                        placeholder="{{ __('Discount') }}" maxlength="150" value="{{ request()->get('discount') ?? '' }}"
-                                        autocomplete="off">
-                                </div>   
+                                 
                                 <!-- Filter by Status -->
                                 <div class="col-md-6 mb-3">
                                     <label for="status" class="form-label">{{ __('Status') }}</label>
@@ -101,12 +93,13 @@
 
                         <hr />
                     </div>
+                    --}}
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Name</th>                                    
-                                    <th>Discount(%)</th>                                   
+                                    <th>Discription</th>                                   
                                     <th>Status</th>
                                     <th>Created At</th>
                                     <th>Action</th>
@@ -114,9 +107,10 @@
                             </thead>
                             <tbody>
                                 @forelse($groups as $key => $group)
-                                <tr>
+                               
+                                <tr> 
                                     <td>{{ $group->name ?? '' }}</td>                                   
-                                    <td>{{ $group->discount ?? '' }}</td>                                   
+                                    <td>{{ $group->description ?? '' }}</td>                                   
                                     <td>
                                         <span
                                             class="p-2 badge {{ $group->status ? 'bg-success' : 'bg-danger' }}">

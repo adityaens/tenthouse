@@ -64,3 +64,6 @@ ALTER TABLE `orders` CHANGE `due_amount` `due_amount` FLOAT(11) NULL DEFAULT NUL
 ALTER TABLE `products` ADD `used_qty` INT NULL DEFAULT NULL AFTER `quantity`;
 ALTER TABLE `products` ADD `rem_qty` INT NULL DEFAULT NULL AFTER `used_qty`;
 
+ALTER TABLE `products` ADD `missing` INT(11) NOT NULL DEFAULT '0' AFTER `rem_qty`, ADD `damaged` INT(11) NOT NULL DEFAULT '0' AFTER `missing`;
+ALTER TABLE `orders` ADD `missing` INT(11) NOT NULL DEFAULT '0' AFTER `quantity`, ADD `damaged` INT(11) NOT NULL DEFAULT '0' AFTER `missing`;
+ALTER TABLE `products` ADD `sku` VARCHAR(50) NOT NULL AFTER `id`;

@@ -8,10 +8,10 @@
 <div class="content-wrapper">
     <!-- Content Header -->
     <div class="content-header">
-        <div class="container-fluid">
+        <div class="container-fluid"> 
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Edit Discount Group</h1>
+                    <h1 class="m-0">Group</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -27,14 +27,14 @@
         @include('components.alert')
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary">
+                <div class="card card-primary  ">
 
                     <div class="card-body">
                         <form action="{{ route('admin.products.groups.update',['id'=>$group->id]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('put')                           
-                            <div class="row"> 
-                                <div class="col-md-6">
+                            <div class="row d-flex justify-content-center"> 
+                                <div class="col-md-7">
                                     <div class="form-group">
                                         <label for="name">Name</label>
                                         <input type="text" name="name" id="name"
@@ -45,18 +45,8 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="price">Discount (%)</label>
-                                        <input type="text" name="discount" id="discount"
-                                            class="form-control @error('discount') is-invalid @enderror"
-                                            placeholder="Enter discount in percentage" value="{{ old('discount', $group->discount ?? '') }}">
-                                        @error('discount')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
+                                
+                                <div class="col-md-7">
                                     <div class="form-group">
                                         <label for="description">Description</label>
                                         <textarea name="description" id="description"
@@ -69,7 +59,7 @@
                                 </div>
                                 
 
-                                <div class="col-md-6">
+                                <div class="col-md-7">
                                     <div class="form-group">
                                         <label for="status">Status</label>
                                         <select name="status" id="status"
@@ -84,7 +74,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row text-center">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-success">Update</button>
                                     <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.products.groups.index') }}'">Back</button>

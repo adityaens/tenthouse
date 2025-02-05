@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('page_title', __('Edit Order'))
-
+ 
 @section('content')
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -38,8 +38,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="customer">Customer<span class="text-danger">*</span></label>
+                                        
                                         <select name="customer" id="customer"
-                                            class="form-control custom-select @error('customer') is-invalid @enderror" readonly>
+                                            class="form-control custom-select @error('customer') is-invalid @enderror" disabled>
                                             <option value="">Select</option>
                                             @forelse($customers as $customer)
                                             <option {{ ($order->user_id == $customer->userId) ? 'selected' : '' }} value="{{ $customer->userId }}">
@@ -57,7 +58,7 @@
                                     <div class="form-group">
                                         <label for="product">Product<span class="text-danger">*</span></label>
                                         <select name="product" id="product"
-                                            class="form-control custom-select @error('product') is-invalid @enderror" readonly>
+                                            class="form-control custom-select @error('product') is-invalid @enderror" disabled>
                                             <option value="">Select</option>
                                             @forelse($products as $product)
                                             <option {{ ($order->product_id == $product->id) ? 'selected' : '' }} value="{{ $product->id }}">
@@ -148,7 +149,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="due_amount">Due Amount<span class="text-danger">*</span></label>
+                                        <label for="due_amount">Due Amount<span class="text-danger">*</span> Discount({{$discount->discount}}%)</label>
                                         <input type="text" name="due_amount" id="due_amount"
                                             class="form-control @error('due_amount') is-invalid @enderror"
                                             placeholder="Enter total amount in Rs" value="{{ old('due_amount', $order->due_amount) }}" readonly>
@@ -275,14 +276,16 @@
     {
         let totalAmount = $('#total_amount').val();
         let paidAmount = $('#paid_amount').val();
-        $('#due_amount').val(calculateDueAmount(totalAmount, paidAmount));
+        let discount= {{$discount->discount}}                
+        $('#due_amount').val(calculateDueAmount(totalAmount, paidAmount,discount));
     }
 
-    function calculateDueAmount(totalAmount, paidAmount)
+    function calculateDueAmount(totalAmount, paidAmount, discount)
     {
         totalAmount = parseFloat(totalAmount) || 0;
         paidAmount = parseFloat(paidAmount) || 0;
-
+        discount=parseFloat(discount) || 0
+        totalAmount= totalAmount-(totalAmount*discount)/100;
         return totalAmount >= paidAmount ? totalAmount - paidAmount : 0;
     }
 
