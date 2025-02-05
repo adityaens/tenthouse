@@ -99,8 +99,12 @@ class OrdersController extends Controller
     {
         $customers = User::select([
             'userId',
-            'name'
+            'name',
+            'group_id'
         ])
+        ->with('group', function($query) {
+            $query->select('id', 'discount');
+        })
             ->where([
                 'roleId' => 2,
                 'status' => ACTIVE
@@ -110,6 +114,7 @@ class OrdersController extends Controller
         $products = Product::select([
             'id',
             'name',
+            'price',
             'rem_qty'
         ])
             ->where('status', ACTIVE)

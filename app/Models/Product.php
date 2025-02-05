@@ -22,19 +22,6 @@ class Product extends Model
         'status',
     ];
 
-    protected $hidden = [
-        'name',
-        'user_id',
-        'cat_id',
-        'description',
-        'price',
-        'quantity',
-        'used_qty',
-        'rem_qty',
-        'product_condition',
-        'status',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'userId');
