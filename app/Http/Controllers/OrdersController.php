@@ -397,4 +397,48 @@ class OrdersController extends Controller
 
         return $createdOrderLog;
     }
+
+    public function view($id)
+    {
+        if (!empty($id)) {
+            $query = Order::select([
+                'id',
+                'order_id',
+                'user_id',
+                'payment_method_id',
+                'quantity',
+                'total_amount',
+                'paid_amount',
+                'due_amount',
+                'delivered_by',
+                'status',
+                'created_at'
+            ]);
+
+            $query->with('product', function ($query) {
+                $query->select('id', 'name');
+            })
+                ->with('user', function ($query) {
+                    $query->select('userId', 'name');
+                })
+                ->with('paymentMethod', function ($query) {
+                    $query->select('id', 'pay_mod');
+                })
+                ->with('orderProducts', function ($query) {
+                    $query->select('*');
+                })
+                ->with('user.groups', function ($query) {
+                    $query->select('*');
+                });
+
+            $order = $query->where('id', $id)
+                ->first();
+
+            return view('admin.orders.view', [
+                'order' => $order
+            ]);
+        } else {
+            return redirect()->route('admin.orders.index')->with('error', showErrorMessage($this->debugMode, 'Order not found'));
+        }
+    }
 }

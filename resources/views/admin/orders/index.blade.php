@@ -166,7 +166,7 @@
                                     <td>{{ date('Y-m-d', strtotime($order->created_at)) }}</td>
                                     <td>
                                         <!-- View Button -->
-                                        <a href="{{ route('admin.orders.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('admin.orders.view', ['id' => $order->id]) }}" class="btn btn-sm btn-warning">
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
 
