@@ -51,7 +51,6 @@ class OrdersController extends Controller
         $query = Order::select([
             'id',
             'user_id',
-            'product_id',
             'payment_method_id',
             'quantity',
             'total_amount',
@@ -86,6 +85,12 @@ class OrdersController extends Controller
             })
             ->with('paymentMethod', function ($query) {
                 $query->select('id', 'pay_mod');
+            })
+            ->with('orderProducts', function ($query) {
+                $query->select('*');
+            })
+            ->with('user.groups', function ($query) {
+                $query->select('*');
             });
 
         $orders = $query->orderBy('id', 'DESC')
@@ -103,11 +108,7 @@ class OrdersController extends Controller
         $customers = User::select([
             'userId',
             'name',
-            'group_id'
         ])
-            ->with('group', function ($query) {
-                $query->select('id', 'discount');
-            })
             ->where([
                 'roleId' => 2,
                 'status' => ACTIVE
@@ -298,7 +299,7 @@ class OrdersController extends Controller
                 $this->createOrderLogs($id, $oldData, $newData);
             }
 
-            return redirect()->route('admin.orders.index')->with('success', 'Product updated successfully.');
+            return redirect()->route('admin.orders.index')->with('success', 'Order modified successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
         }

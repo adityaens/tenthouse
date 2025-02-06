@@ -39,4 +39,9 @@ class Order extends Model
     {
         return $this->belongsTo(PaymentModel::class, 'payment_method_id', 'id');
     }
+
+    public function orderProducts()
+    {
+        return $this->hasMany(OrderProduct::class);
+    }
 }

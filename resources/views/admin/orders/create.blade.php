@@ -128,10 +128,8 @@
 @endsection
 @section('script')
 <link rel="stylesheet" href="{{ asset('css/tempusdominus-bootstrap-4.min.css') }}">
-<link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
-<script src="{{ asset('js/moment.min.js') }}"></script>
-<script src="{{ asset('js/daterangepicker.min.js') }}"></script>
-<script src="{{ asset('js/tempusdominus-bootstrap-4.min.js') }}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         let productInput = document.getElementById("product");
@@ -309,7 +307,20 @@
                 debugger;
             }
 
-            if (!productId || !userId || !quantity) return;
+            if (!productId) {
+                toastr.error('Select Product.');
+                return;
+            }
+
+            if(!userId) {
+                toastr.error('Select User.')
+                return;
+            }
+
+            if(!quantity) {
+                toastr.error('Select Quantity');
+                return;
+            }
 
             $('#cart_list tr').each(function() {
                 if ($(this).data('product') == productId) {
@@ -318,6 +329,7 @@
             });
 
             if (productExists) {
+                toastr.error('Product already added.');
                 return;
             }
 
@@ -410,7 +422,6 @@
             <td></td>
             <td class="sum_qty_products">Total Qty.</td>
             <td class="sum_all_products">Total Price:</td>
-            <td></td>
             </tr>
             </tfoot>
             </table></div>`;
@@ -476,7 +487,7 @@
         // Collect customer ID if needed
         let userId = $('#userId').val();
         if (!userId) {
-            alert('Please select a customer.');
+            toastr.error('Please select a customer.');
             return;
         }
         formData.append('userId', userId);
@@ -503,7 +514,7 @@
         });
 
         if (cartItems.length === 0) {
-            alert('Cart is empty!');
+            toastr.error('Cart is empty!');
             return;
         }
 
@@ -526,7 +537,7 @@
             },
             error: function(xhr) {
                 console.log(xhr.responseText);
-                alert('Something went wrong. Please try again.');
+                toastr.error('Something went wrong. Please try again.');
             }
         });
     }

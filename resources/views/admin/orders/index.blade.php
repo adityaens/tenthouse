@@ -58,7 +58,7 @@
                         </div> -->
                 <div class="card-body">
 
-                    <div class="filter-form-wrapper mb-5">
+                    {{--<div class="filter-form-wrapper mb-5">
 
                         <form class="form filter-form" method="GET">
                             <div class="row">
@@ -123,14 +123,14 @@
                         </form>
 
                         <hr />
-                    </div>
+                    </div>--}}
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>S. No.</th>
                                     <th>Customer</th>
-                                    <th>Product</th>
+                                    <th>Group</th>
                                     <th>Quantity</th>
                                     <th>Total Amount</th>
                                     <th>Paid Amount</th>
@@ -146,7 +146,13 @@
                                 <tr>
                                     <td>{{ $i }}</td>
                                     <td>{{ $order->user->name ?? '' }}</td>
-                                    <td>{{ $order->product->name ?? '' }}</td>
+                                    <td>
+                                        @forelse ($order->user->groups as $group)
+                                            {{ $group->name }} <br>
+                                        @empty
+                                            
+                                        @endforelse
+                                    </td>
                                     <td>{{ $order->quantity ?? '' }}</td>
                                     <td>{{ $order->total_amount ?? '' }}</td>
                                     <td>{{ $order->paid_amount ?? '' }}</td>
@@ -159,6 +165,11 @@
                                     </td>
                                     <td>{{ date('Y-m-d', strtotime($order->created_at)) }}</td>
                                     <td>
+                                        <!-- View Button -->
+                                        <a href="{{ route('admin.orders.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-warning">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
                                         <!-- Edit Button -->
                                         <a href="{{ route('admin.orders.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i>
