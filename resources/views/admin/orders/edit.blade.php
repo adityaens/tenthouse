@@ -1,7 +1,7 @@
 @extends('layouts.user_type.auth')
 
 @section('page_title', __('Edit Order'))
- 
+
 @section('content')
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -35,7 +35,7 @@
 
                             <!-- Row for Description -->
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="paymentMethod">Payment Method<span class="text-danger">*</span></label>
                                         <select name="payment_method" id="payment_method"
@@ -53,18 +53,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="quantity">Quantity<span class="text-danger">*</span></label>
-                                        <input type="text" name="quantity" id="quantity"
-                                            class="form-control @error('quantity') is-invalid @enderror"
-                                            placeholder="Enter Quantity" value="{{ old('quantity', $order->quantity) }}">
-                                        @error('quantity')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="booking_date_range">Booking Date Range<span class="text-danger">*</span></label>
                                         <div class="input-group">
@@ -73,7 +62,10 @@
                                                     <i class="far fa-calendar-alt"></i>
                                                 </span>
                                             </div>
-                                            <input type="text" class="form-control float-right @error('booking_date_range') is-invalid @enderror" id="booking_date_range" name="booking_date_range" value="{{ old('booking_date_range', ($order->booking_date_from .' - '. $order->booking_date_to)) }}">
+                                            <input type="text" class="form-control float-right @error('booking_date_range') is-invalid @enderror"
+                                                id="booking_date_range"
+                                                name="booking_date_range"
+                                                value="{{ old('booking_date_range', ($order->booking_date_from && $order->booking_date_to ? $order->booking_date_from . ' - ' . $order->booking_date_to : '')) }}">
                                         </div>
                                         @error('booking_date_range')
                                         <span class="error invalid-feedback">{{ $message }}</span>
@@ -89,7 +81,7 @@
                                         <label for="total_amount">Total Amount<span class="text-danger">*</span></label>
                                         <input type="text" name="total_amount" id="total_amount"
                                             class="form-control @error('total_amount') is-invalid @enderror"
-                                            placeholder="Enter total amount in Rs" value="{{ old('total_amount', $order->total_amount) }}">
+                                            placeholder="Enter total amount in Rs" value="{{ old('total_amount', $order->total_amount) }}" disabled>
                                         @error('total_amount')
                                         <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -108,10 +100,10 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="due_amount">Due Amount<span class="text-danger">*</span> Discount({{$discount->discount}}%)</label>
+                                        <label for="due_amount">Due Amount<span class="text-danger">*</span></label>
                                         <input type="text" name="due_amount" id="due_amount"
                                             class="form-control @error('due_amount') is-invalid @enderror"
-                                            placeholder="Enter total amount in Rs" value="{{ old('due_amount', $order->due_amount) }}" readonly>
+                                            placeholder="Enter total amount in Rs" value="{{ old('due_amount', $order->due_amount) }}">
                                         @error('due_amount')
                                         <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -179,7 +171,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-success">Update</button>
-                                    <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.orders.index') }}'">Back</button>
+                                    {{--<button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.orders.index') }}'">Back</button>--}}
                                 </div>
                             </div>
                         </form>
@@ -225,28 +217,7 @@
                 clear: 'fas fa-trash',
                 close: 'fas fa-times'
             }
-        });
-
-        $('#total_amount, #paid_amount').on('input', updateDueAmount);
-
+        })
     });
-
-    function updateDueAmount()
-    {
-        let totalAmount = $('#total_amount').val();
-        let paidAmount = $('#paid_amount').val();
-        let discount= {{$discount->discount}}                
-        $('#due_amount').val(calculateDueAmount(totalAmount, paidAmount,discount));
-    }
-
-    function calculateDueAmount(totalAmount, paidAmount, discount)
-    {
-        totalAmount = parseFloat(totalAmount) || 0;
-        paidAmount = parseFloat(paidAmount) || 0;
-        discount=parseFloat(discount) || 0
-        totalAmount= totalAmount-(totalAmount*discount)/100;
-        return totalAmount >= paidAmount ? totalAmount - paidAmount : 0;
-    }
-
 </script>
 @endsection

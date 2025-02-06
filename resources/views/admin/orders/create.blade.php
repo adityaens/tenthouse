@@ -24,17 +24,20 @@
         display: none;
     }
 
-    #product, #user {
+    #product,
+    #user {
         width: 100%;
         padding: 10px;
         font-size: 16px;
     }
 
-    .product-list, .user-list {
+    .product-list,
+    .user-list {
         margin-top: 10px;
     }
 
-    .product, .user {
+    .product,
+    .user {
         padding: 10px;
         border: 1px solid #ddd;
         margin-bottom: 5px;
@@ -210,83 +213,84 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-    let userInput = document.getElementById("user");
-    let resultsDiv = document.getElementById("results1");
+        let userInput = document.getElementById("user");
+        let resultsDiv = document.getElementById("results1");
 
-    if (userInput) {
-        userInput.addEventListener("input", function() {
-            getSearchUsers(userInput.value);
-        });
-    } else {
-        console.error("Element #user not found");
-    }
-});
-
-// Function to perform AJAX request
-function getSearchUsers(customerKeyword) {
-    if (customerKeyword.trim() === "") {
-        document.getElementById("results1").innerHTML = ""; // Clear results if input is empty
-        return;
-    }
-
-    // Using Fetch API instead of jQuery's $.ajax
-    fetch("{{ route('admin.users.getUsersList') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ customerKeyword: customerKeyword })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            displayResults1(data.customers);
+        if (userInput) {
+            userInput.addEventListener("input", function() {
+                getSearchUsers(userInput.value);
+            });
+        } else {
+            console.error("Element #user not found");
         }
-    })
-    .catch(error => {
-        console.log("Error fetching users:", error);
-    });
-}
-
-// Function to display search results as suggestions
-function displayResults1(filteredUsers) {
-    let resultsDiv = document.getElementById("results1");
-    resultsDiv.innerHTML = ""; // Clear previous results
-
-    if (filteredUsers.length === 0) {
-        resultsDiv.innerHTML = "<p>No users found</p>";
-        return;
-    }
-
-    filteredUsers.forEach(user => {
-        const div = document.createElement("div");
-        div.classList.add("user");
-        div.textContent = user.name;
-        div.onclick = function() {
-            selectProduct1(user.name, user.userId); // Pass both name and ID
-        }; 
-        resultsDiv.appendChild(div);
     });
 
-    resultsDiv.style.display = "block"; // Show results
-}
+    // Function to perform AJAX request
+    function getSearchUsers(customerKeyword) {
+        if (customerKeyword.trim() === "") {
+            document.getElementById("results1").innerHTML = ""; // Clear results if input is empty
+            return;
+        }
 
-// Function to handle product selection
-function selectProduct1(userName, userId) {
-    let userInput = document.getElementById("user");
-    userInput.value = userName; // Fill input field
-    document.getElementById("userId").value = userId; // Set userId value
-    document.getElementById("results1").style.display = "none"; // Hide suggestions
-}
-
-// Hide suggestions when clicking outside
-document.addEventListener("click", function(event) {
-    if (!event.target.closest("#user") && !event.target.closest("#results1")) {
-        document.getElementById("results1").style.display = "none";
+        // Using Fetch API instead of jQuery's $.ajax
+        fetch("{{ route('admin.users.getUsersList') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    customerKeyword: customerKeyword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayResults1(data.customers);
+                }
+            })
+            .catch(error => {
+                console.log("Error fetching users:", error);
+            });
     }
-});
 
+    // Function to display search results as suggestions
+    function displayResults1(filteredUsers) {
+        let resultsDiv = document.getElementById("results1");
+        resultsDiv.innerHTML = ""; // Clear previous results
+
+        if (filteredUsers.length === 0) {
+            resultsDiv.innerHTML = "<p>No users found</p>";
+            return;
+        }
+
+        filteredUsers.forEach(user => {
+            const div = document.createElement("div");
+            div.classList.add("user");
+            div.textContent = user.name;
+            div.onclick = function() {
+                selectProduct1(user.name, user.userId); // Pass both name and ID
+            };
+            resultsDiv.appendChild(div);
+        });
+
+        resultsDiv.style.display = "block"; // Show results
+    }
+
+    // Function to handle product selection
+    function selectProduct1(userName, userId) {
+        let userInput = document.getElementById("user");
+        userInput.value = userName; // Fill input field
+        document.getElementById("userId").value = userId; // Set userId value
+        document.getElementById("results1").style.display = "none"; // Hide suggestions
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", function(event) {
+        if (!event.target.closest("#user") && !event.target.closest("#results1")) {
+            document.getElementById("results1").style.display = "none";
+        }
+    });
 </script>
 <script>
     let debugMode = false;

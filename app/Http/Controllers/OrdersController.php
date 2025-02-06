@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
-use App\Models\Group;
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderLog;
 use App\Models\OrderProduct;
@@ -11,7 +11,7 @@ use App\Models\PaymentModel;
 use App\Models\Product;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 
@@ -105,9 +105,9 @@ class OrdersController extends Controller
             'name',
             'group_id'
         ])
-        ->with('group', function($query) {
-            $query->select('id', 'discount');
-        })
+            ->with('group', function ($query) {
+                $query->select('id', 'discount');
+            })
             ->where([
                 'roleId' => 2,
                 'status' => ACTIVE
@@ -149,13 +149,13 @@ class OrdersController extends Controller
             $totalPrice = 0;
             $totalQty = 0;
             $userId = $request->input('userId');
-            if(!$request->has('userId')) {
+            if (!$request->has('userId')) {
                 return response()->json([
                     'success' => false,
                     'error' => showErrorMessage($this->debugMode, 'User NOT found.'),
                 ]);
             }
-            
+
             $orderProducts = json_decode($request->input('cartItems'), true);
 
             $order = Order::create([
@@ -163,8 +163,8 @@ class OrdersController extends Controller
                 'user_id' => $userId
             ]);
 
-            if($order) {
-                foreach($orderProducts as $orderProduct) {
+            if ($order) {
+                foreach ($orderProducts as $orderProduct) {
                     // Ensure that unitPrice and quantity are properly converted to float
                     $unitPrice = (int)$orderProduct['unitPrice'];
                     $quantity = (int)$orderProduct['quantity'];
@@ -187,6 +187,7 @@ class OrdersController extends Controller
                 $order->total_amount = $totalPrice;
                 $order->quantity = $totalQty;
                 $order->update();
+                Cart::truncate();
             } else {
                 return response()->json([
                     'success' => false,
@@ -213,19 +214,21 @@ class OrdersController extends Controller
         if (!empty($id)) {
             $order = Order::find($id);
 
-            $paymentMethods = PaymentModel::select([
-                'id',
-                'pay_mod'
-            ])
-                ->get();
+            if ($order) {
+                $paymentMethods = PaymentModel::select([
+                    'id',
+                    'pay_mod'
+                ])
+                    ->get();
 
-            return view('admin.orders.edit', [
-                'order' => $order,
-                'paymentMethods' => $paymentMethods
-            ]);
+                return view('admin.orders.edit', [
+                    'order' => $order,
+                    'paymentMethods' => $paymentMethods
+                ]);
+            }
         }
 
-        return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Id not found'));
+        return redirect()->route('admin.orders.index')->with('error', showErrorMessage($this->debugMode, 'Order not found'));
     }
 
     /**
@@ -238,41 +241,22 @@ class OrdersController extends Controller
      */
     public function update(OrderRequest $request, $id)
     {
-
         $isUpdated = false;
         $discount = 0;
         $oldData = [];
         $newData = [];
 
         if (empty($id)) {
-            return redirect()->route('admin.products.index')->with('error', showErrorMessage($this->debugMode, 'Id not found'));
+            return redirect()->route('admin.orders.index')->with('error', showErrorMessage($this->debugMode, 'Id not found'));
         }
 
         $dates = $this->parseBookingDateRange($request->input('booking_date_range'));
 
         try {
             $order = Order::find($id);
-            $customerId = !empty($order->user_id) ? $order->user_id : 0;
 
-            if(!empty($customerId)) {
-                $customer = User::where('userId', $customerId)
-                ->with('group', function($query) {
-                    $query->select('id', 'name', 'discount');
-                })
-                ->first();
-                if($customer) {
-                    $discount = !empty($customer->group->discount) ? $customer->group->discount : 0;
-                }
-            }
-            
-            list($totalAmount, $paidAmount, $dueAmount) = $this->calculateAmountDetails(
-                $request->input('total_amount'),
-                $request->input('paid_amount'),
-                $discount
-            );
-
-            if($dueAmount < 0) {
-                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due amount less than Zero'));
+            if (($request->input('due_amount') < 0) || ($request->input('paid_amount') < 0)) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due/Paid amount less than Zero'));
             }
 
             $oldData = $this->getOrderLogDataArray($order);
@@ -280,21 +264,15 @@ class OrdersController extends Controller
             if ($request->has('payment_method')) {
                 $order->payment_method_id = $request->input('payment_method');
             }
-            if ($request->has('quantity')) {
-                $order->quantity = $request->input('quantity');
-            }
             if ($request->has('booking_date_range')) {
                 $order->booking_date_from = $dates['start'];
                 $order->booking_date_to = $dates['end'];
             }
-            if ($request->has('total_amount')) {
-                $order->total_amount = $request->input('total_amount');
+            if ($request->has('paid_amount')) {
+                $order->paid_amount = $request->input('paid_amount');
             }
-            if (isset($paidAmount)) {
-                $order->paid_amount = $paidAmount;
-            }
-            if (isset($dueAmount)) {
-                $order->due_amount = $dueAmount;
+            if ($request->has('due_amount')) {
+                $order->due_amount = $request->input('due_amount');
             }
             if ($request->has('due_date')) {
                 $order->due_date = $request->input('due_date');
@@ -370,9 +348,9 @@ class OrdersController extends Controller
         $totalAmount = floatval($totalAmount) * (1 - ($discount / 100));
         $paidAmount = floatval($paidAmount);
         $dueAmount = max($totalAmount - $paidAmount, 0); // Ensures due amount is never negative
-    
+
         return [$totalAmount, $paidAmount, $dueAmount];
-    }    
+    }
 
     private function generateUniqueOrderId()
     {
@@ -388,7 +366,6 @@ class OrdersController extends Controller
         return [
             'order_id' => $order->order_id ?? '',
             'user_id' => $order->user_id ?? '',
-            'product_id' => $order->product_id ?? '',
             'payment_method_id' => $order->payment_method_id ?? '',
             'quantity' => $order->quantity ?? '',
             'total_amount' => $order->total_amount ?? '',

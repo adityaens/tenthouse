@@ -23,23 +23,16 @@ class OrderRequest extends FormRequest
      */
     public function rules()
     {
-        $rules= [
-            'customer' => 'required|numeric',
-            'product' => 'required|numeric',
+        $rules = [
             'payment_method' => 'required|numeric',
-            'quantity' => 'required|numeric|min:0',
             'booking_date_range' => 'required',
-            'total_amount' => 'required|numeric|min:0',
             'paid_amount' => 'required|numeric|min:0',
+            'due_amount' => 'required|numeric|min:0',
             'due_date' => 'required',
             'status' => 'required|numeric',
             'delivered_by' => 'required|string',
         ];
-        
-        if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $rules['customer'] = '';
-            $rules['product'] = '';
-        }
+
         return $rules;
     }
 
