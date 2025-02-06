@@ -70,3 +70,9 @@ ALTER TABLE `products` ADD `sku` VARCHAR(50) NOT NULL AFTER `id`;
 
 ALTER TABLE `orders` ADD `quantity` INT NULL DEFAULT NULL AFTER `payment_method_id`;
 ALTER TABLE `tbl_users` CHANGE `group_id` `group_id` VARCHAR(100) NULL DEFAULT NULL;
+
+
+ALTER TABLE `orders` ADD INDEX(`user_id`);
+ALTER TABLE `orders` ADD INDEX(`payment_method_id`);
+ALTER TABLE `order_products` ADD INDEX(`order_id`);
+ALTER TABLE `order_products` ADD INDEX(`product_id`);

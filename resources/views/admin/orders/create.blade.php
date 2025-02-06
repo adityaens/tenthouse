@@ -184,7 +184,7 @@
             const div = document.createElement("div");
             const productId = document.getElementById('productId');
             div.classList.add("product");
-            div.textContent = product.name;
+            div.textContent = product.name+'('+product.rem_qty+')';
             div.onclick = function() {
                 productId.value = product.id;
                 selectProduct(product.name);
@@ -365,6 +365,8 @@
                     }
 
                     if ($('#cart_list tr').data('id') == response.cart.id) return;
+
+                    $('#user').prop('disabled', true);
 
                     updateCartUI(cart);
                     $('#create_order').show();

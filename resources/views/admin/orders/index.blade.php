@@ -158,6 +158,17 @@
                                     <td>{{ $order->paid_amount ?? '' }}</td>
                                     <td>{{ $order->due_amount ?? '' }}</td>
                                     <td>
+                                        {{--
+                                            @if($order->status == 0)
+
+                                        @elseif ($order->status == 1)
+
+                                        @elseif ($order->status == 2)
+
+                                        
+                                            class="p-2 badge {{ $order->status ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $order->status ? 'Active' : 'Inactive' }}
+                                            --}}
                                         <span
                                             class="p-2 badge {{ $order->status ? 'bg-success' : 'bg-danger' }}">
                                             {{ $order->status ? 'Active' : 'Inactive' }}

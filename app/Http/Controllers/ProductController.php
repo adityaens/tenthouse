@@ -338,7 +338,8 @@ class ProductController extends Controller
 
             $products = Product::select([
                 'id',
-                'name'
+                'name',
+                'rem_qty'
             ])
             ->where('status', ACTIVE)
             ->where('name', 'like', $productKeyword .'%')
