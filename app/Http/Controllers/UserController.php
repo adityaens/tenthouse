@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+
+    private $debugMode;
+
+    public function __construct()
+    {
+        $this->debugMode = config('constants.debug_mode');
+    }
+
     /**
     * This function is used to load the user list
     */

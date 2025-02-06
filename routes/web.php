@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/users/edit/{id}', [CustomerController::class, 'edit'])->name('admin.user.edit');
         Route::put('/users/update/{id}', [CustomerController::class, 'update'])->name('admin.user.update');
         Route::delete('/users/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.user.destroy');
+        Route::post('/users/list', [CustomerController::class, 'getUsersList'])->name('admin.users.getUsersList');
 
         // Products entries
         Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
@@ -57,6 +58,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products/edit/{id}', [ProductController::class, 'edit'])->name('admin.products.edit');
         Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        Route::post('/products/list', [ProductController::class, 'getProductsList'])->name('admin.products.getProductsList');
 
 
         //Group
@@ -66,6 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/products/groups/edit/{id}', [GroupController::class, 'edit'])->name('admin.products.groups.edit');
         Route::put('/products/groups/update/{id}', [GroupController::class, 'update'])->name('admin.products.groups.update');
         Route::delete('/products/groups/destroy/{id}', [GroupController::class, 'destroy'])->name('admin.products.groups.destroy');
+
 
         // product categories entry
         Route::get('/products/categories/index', [ProductCateoryController::class, 'index'])->name('admin.products.category.index');

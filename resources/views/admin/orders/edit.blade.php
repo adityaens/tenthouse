@@ -33,47 +33,6 @@
                             @csrf
                             @method('put')
 
-                            <!-- Row for Name and Category -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="customer">Customer<span class="text-danger">*</span></label>
-                                        
-                                        <select name="customer" id="customer"
-                                            class="form-control custom-select @error('customer') is-invalid @enderror" disabled>
-                                            <option value="">Select</option>
-                                            @forelse($customers as $customer)
-                                            <option {{ ($order->user_id == $customer->userId) ? 'selected' : '' }} value="{{ $customer->userId }}">
-                                                {{ $customer->name }}
-                                            </option>
-                                            @empty
-                                            @endforelse
-                                        </select>
-                                        @error('customer')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="product">Product<span class="text-danger">*</span></label>
-                                        <select name="product" id="product"
-                                            class="form-control custom-select @error('product') is-invalid @enderror" disabled>
-                                            <option value="">Select</option>
-                                            @forelse($products as $product)
-                                            <option {{ ($order->product_id == $product->id) ? 'selected' : '' }} value="{{ $product->id }}">
-                                                {{ $product->name }} ( Rem: {{ $product->rem_qty }} )
-                                            </option>
-                                            @empty
-                                            @endforelse
-                                        </select>
-                                        @error('product')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Row for Description -->
                             <div class="row">
                                 <div class="col-md-4">

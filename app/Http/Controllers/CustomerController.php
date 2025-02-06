@@ -7,11 +7,19 @@ use App\Http\Requests\CustomerRequest;
 use Illuminate\Support\Str;
 use App\Models\Group;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
+    private $debugMode;
+
+    public function __construct()
+    {
+        $this->debugMode = config('constants.debug_mode');
+    }
+    
     public function index(Request $request)
     {
         $groups=Group::where('status',1)->pluck('name','id');
@@ -98,4 +106,38 @@ class CustomerController extends Controller
         return redirect()->route('admin.user.index')->with('error','Something went wrong');
   
       }
+
+      public function getUsersList(Request $request)
+    {
+        $customerKeyword = $request->input('customerKeyword');
+        try {
+
+            if(empty($customerKeyword)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'Nothing to search.')
+                ]);
+            }
+
+            $customers = User::select([
+                'userId',
+                'name'
+            ])
+            ->where('status', ACTIVE)
+            ->where('roleId', CUSTOMER)
+            ->where('name', 'like', $customerKeyword .'%')
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'customers' => $customers
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => showErrorMessage($this->debugMode, $e->getMessage())
+            ]);
+        }
+    }
 }

@@ -323,4 +323,37 @@ class ProductController extends Controller
             'updated_at' => now(),
         ]);
     }
+
+    public function getProductsList(Request $request)
+    {
+        $productKeyword = $request->input('productKeyword');
+        try {
+
+            if(empty($productKeyword)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'Nothing to search.')
+                ]);
+            }
+
+            $products = Product::select([
+                'id',
+                'name'
+            ])
+            ->where('status', ACTIVE)
+            ->where('name', 'like', $productKeyword .'%')
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'products' => $products
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => showErrorMessage($this->debugMode, $e->getMessage())
+            ]);
+        }
+    }
 }

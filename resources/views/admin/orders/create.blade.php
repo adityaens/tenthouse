@@ -23,6 +23,23 @@
     #create_order {
         display: none;
     }
+
+    #product, #user {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .product-list, .user-list {
+        margin-top: 10px;
+    }
+
+    .product, .user {
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
 </style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -57,25 +74,15 @@
                             <div class="row mb-4">
                                 <div class="col-md-5">
                                     <label for="user" class="form-label fw-bold">Customer</label>
-                                    <select class="form-control select2 mb-2" id="user">
-                                        <option value="">Select Customer</option>
-                                        @forelse ($customers as $customer)
-                                        <option value="{{ $customer->userId }}">{{ $customer->name }}</option>
-                                        @empty
-                                        <option disabled>No customers available</option>
-                                        @endforelse
-                                    </select>
+                                    <input type="hidden" id="userId">
+                                    <input type="text" id="user" placeholder="Type to search...">
+                                    <div id="results1" class="user-list"></div>
                                 </div>
                                 <div class="col-md-5">
                                     <label for="product" class="form-label fw-bold">Search for a Product</label>
-                                    <select class="form-control select2 mb-2" id="product">
-                                        <option value="">Select Product</option>
-                                        @forelse ($products as $product)
-                                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                        @empty
-                                        <option disabled>No products available</option>
-                                        @endforelse
-                                    </select>
+                                    <input type="hidden" id="productId">
+                                    <input type="text" id="product" placeholder="Type to search...">
+                                    <div id="results" class="product-list"></div>
                                 </div>
                                 <div class="col-md-2 text-center">
                                     <label for="quantity" class="form-label fw-bold">Quantity</label>
@@ -123,14 +130,173 @@
 <script src="{{ asset('js/daterangepicker.min.js') }}"></script>
 <script src="{{ asset('js/tempusdominus-bootstrap-4.min.js') }}"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let productInput = document.getElementById("product");
+        let resultsDiv = document.getElementById("results");
+
+        if (productInput) {
+            productInput.addEventListener("input", function() {
+                getSearchProducts(productInput.value);
+            });
+        } else {
+            console.error("Element #product not found");
+        }
+    });
+
+    function getSearchProducts(productKeyword) {
+        if (productKeyword.trim() === "") {
+            document.getElementById("results").innerHTML = ""; // Clear results if input is empty
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('admin.products.getProductsList') }}",
+            type: "POST",
+            data: {
+                productKeyword: productKeyword
+            },
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            },
+            success: function(response) {
+                if (response.success) {
+                    displayResults(response.products);
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseJSON.error);
+            }
+        });
+    }
+
+    // Function to display search results as suggestions
+    function displayResults(filteredProducts) {
+        let resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = ""; // Clear previous results
+
+        if (filteredProducts.length === 0) {
+            resultsDiv.innerHTML = "<p>No products found</p>";
+            return;
+        }
+
+        filteredProducts.forEach(product => {
+            const div = document.createElement("div");
+            const productId = document.getElementById('productId');
+            div.classList.add("product");
+            div.textContent = product.name;
+            div.onclick = function() {
+                productId.value = product.id;
+                selectProduct(product.name);
+            }; // Fill input on click
+            resultsDiv.appendChild(div);
+        });
+
+        resultsDiv.style.display = "block"; // Show results
+    }
+
+    // Function to handle product selection
+    function selectProduct(productName) {
+        let productInput = document.getElementById("product");
+        productInput.value = productName; // Fill input field
+        document.getElementById("results").style.display = "none"; // Hide suggestions
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", function(event) {
+        if (!event.target.closest("#product") && !event.target.closest("#results")) {
+            document.getElementById("results").style.display = "none";
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    let userInput = document.getElementById("user");
+    let resultsDiv = document.getElementById("results1");
+
+    if (userInput) {
+        userInput.addEventListener("input", function() {
+            getSearchUsers(userInput.value);
+        });
+    } else {
+        console.error("Element #user not found");
+    }
+});
+
+// Function to perform AJAX request
+function getSearchUsers(customerKeyword) {
+    if (customerKeyword.trim() === "") {
+        document.getElementById("results1").innerHTML = ""; // Clear results if input is empty
+        return;
+    }
+
+    // Using Fetch API instead of jQuery's $.ajax
+    fetch("{{ route('admin.users.getUsersList') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ customerKeyword: customerKeyword })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayResults1(data.customers);
+        }
+    })
+    .catch(error => {
+        console.log("Error fetching users:", error);
+    });
+}
+
+// Function to display search results as suggestions
+function displayResults1(filteredUsers) {
+    let resultsDiv = document.getElementById("results1");
+    resultsDiv.innerHTML = ""; // Clear previous results
+
+    if (filteredUsers.length === 0) {
+        resultsDiv.innerHTML = "<p>No users found</p>";
+        return;
+    }
+
+    filteredUsers.forEach(user => {
+        const div = document.createElement("div");
+        div.classList.add("user");
+        div.textContent = user.name;
+        div.onclick = function() {
+            selectProduct1(user.name, user.userId); // Pass both name and ID
+        }; 
+        resultsDiv.appendChild(div);
+    });
+
+    resultsDiv.style.display = "block"; // Show results
+}
+
+// Function to handle product selection
+function selectProduct1(userName, userId) {
+    let userInput = document.getElementById("user");
+    userInput.value = userName; // Fill input field
+    document.getElementById("userId").value = userId; // Set userId value
+    document.getElementById("results1").style.display = "none"; // Hide suggestions
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", function(event) {
+    if (!event.target.closest("#user") && !event.target.closest("#results1")) {
+        document.getElementById("results1").style.display = "none";
+    }
+});
+
+</script>
+<script>
     let debugMode = false;
     $(document).ready(function() {
         let cart = [];
 
         $('#add_cart_btn').on('click', function() {
             let productExists = false;
-            let userId = $('#user').find(':selected').val();
-            let productId = $('#product').find(':selected').val();
+            let userId = $('#userId').val();
+            let productId = $('#productId').val();
             let quantity = $('#quantity').val();
 
             if (debugMode) {
@@ -171,7 +337,6 @@
                         id: response.cart.id,
                         name: response.cart.product.name,
                         productId: response.cart.product.id,
-                        group: response.cart.user.group.name,
                         sku: response.cart.product.sku,
                         unitPrice: response.cart.product.price,
                         quantity: response.cart.quantity,
@@ -202,7 +367,6 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>Name</th>
-                        <th>Group</th>
                         <th>SKU</th>
                         <th>Unit Price</th>
                         <th>Qty</th>
@@ -217,7 +381,6 @@
                 cartHtml += `
             <tr data-id="${item.id}" data-product="${item.productId}">
                 <td>${item.name}</td>
-                <td>${item.group}</td>
                 <td>${item.sku}</td>
                 <td>₹${item.unitPrice}</td>
                 <td>
@@ -285,7 +448,7 @@
         // Listen for quantity input changes
         $(document).on('input', '.quantity', function() {
             let row = $(this).closest('tr');
-            let unitPrice = parseFloat(row.find('td:nth-child(4)').text().replace('₹', '').trim()) || 0;
+            let unitPrice = parseFloat(row.find('td:nth-child(3)').text().replace('₹', '').trim()) || 0;
             let qty = parseInt($(this).val()) || 0;
             let total = unitPrice * qty;
 
@@ -307,7 +470,7 @@
         let formData = new FormData();
 
         // Collect customer ID if needed
-        let userId = $('#user').val();
+        let userId = $('#userId').val();
         if (!userId) {
             alert('Please select a customer.');
             return;
@@ -320,16 +483,14 @@
         $('#cart_list tbody tr').each(function() {
             let productId = $(this).data('product');
             let productName = $(this).find('td:nth-child(1)').text().trim();
-            let group = $(this).find('td:nth-child(2)').text().trim();
-            let sku = $(this).find('td:nth-child(3)').text().trim();
-            let unitPrice = parseFloat($(this).find('td:nth-child(4)').text().replace('₹', '').trim()) || 0;
+            let sku = $(this).find('td:nth-child(2)').text().trim();
+            let unitPrice = parseFloat($(this).find('td:nth-child(3)').text().replace('₹', '').trim()) || 0;
             let quantity = parseInt($(this).find('.quantity').val()) || 1;
             let totalPrice = parseFloat($(this).find('.total-price').text().replace('₹', '').trim()) || 0;
 
             cartItems.push({
                 productId,
                 productName,
-                group,
                 sku,
                 unitPrice,
                 quantity,
@@ -355,7 +516,7 @@
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
             },
             success: function(response) {
-                if(response.success) {
+                if (response.success) {
                     window.location.href = `/admin/orders/edit/${response.orderId}`;
                 }
             },

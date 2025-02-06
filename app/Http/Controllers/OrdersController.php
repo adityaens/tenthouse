@@ -146,6 +146,8 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         try {
+            $totalPrice = 0;
+            $totalQty = 0;
             $userId = $request->input('userId');
             if(!$request->has('userId')) {
                 return response()->json([
@@ -163,6 +165,15 @@ class OrdersController extends Controller
 
             if($order) {
                 foreach($orderProducts as $orderProduct) {
+                    // Ensure that unitPrice and quantity are properly converted to float
+                    $unitPrice = (int)$orderProduct['unitPrice'];
+                    $quantity = (int)$orderProduct['quantity'];
+
+                    // Calculate total price for this product and update totalPrice
+                    $productTotalPrice = $unitPrice * $quantity;
+                    $totalPrice += $productTotalPrice;
+                    $totalQty += $quantity;
+
                     OrderProduct::create([
                         'order_id' => $order->id,
                         'product_id' => $orderProduct['productId'],
@@ -173,6 +184,9 @@ class OrdersController extends Controller
                         'total_price' => $orderProduct['totalPrice']
                     ]);
                 }
+                $order->total_amount = $totalPrice;
+                $order->quantity = $totalQty;
+                $order->update();
             } else {
                 return response()->json([
                     'success' => false,
@@ -199,28 +213,6 @@ class OrdersController extends Controller
         if (!empty($id)) {
             $order = Order::find($id);
 
-            $customers = User::select([
-                'userId',
-                'name',
-                'group_id'
-            ])
-                ->where([
-                    'roleId' => 2,
-                    'status' => ACTIVE
-                ])
-                ->get();
-           
-            $discount= Group::where('id',$customers[0]->group_id)->select('discount')->first();
-           
-            $products = Product::select([
-                'id',
-                'name',
-                'rem_qty'
-            ])
-                ->where('status', ACTIVE)
-                ->where('rem_qty', '>', 0)
-                ->get();
-
             $paymentMethods = PaymentModel::select([
                 'id',
                 'pay_mod'
@@ -229,9 +221,6 @@ class OrdersController extends Controller
 
             return view('admin.orders.edit', [
                 'order' => $order,
-                'customers' => $customers,
-                'discount' => $discount,
-                'products' => $products,
                 'paymentMethods' => $paymentMethods
             ]);
         }
