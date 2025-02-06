@@ -81,7 +81,7 @@
                                                     type="checkbox"
                                                     id="inlineCheckbox{{$key}}"
                                                     value="{{$key}}" 
-                                                    {{ in_array($key, old('group', [])) ? 'checked' : '' }}>
+                                                    {{ is_array(request()->get('group')) && in_array($key, request()->get('group')) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group}}</label>
                                             </div>
                                             @endforeach
