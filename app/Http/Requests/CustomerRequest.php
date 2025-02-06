@@ -25,7 +25,8 @@ class CustomerRequest extends FormRequest
     {
         return [
             'name'=>'required',
-            'mobile'=>'required|digits:10'
+            'mobile'=>'required|digits:10',
+            'group' => 'required'
         ];
     }
 }

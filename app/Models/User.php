@@ -55,7 +55,8 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at' => 'datetime',        
+
     ];
 
     /**
@@ -190,8 +191,12 @@ class User extends Authenticatable
         return $query->toArray();
     }
 
-    public function group()
+
+
+    public function groups()
     {
-        return $this->belongsTo(Group::class, 'group_id', 'id');
+        return $this->belongsToMany(Group::class, 'userid_groupids', 'user_id', 'group_id');
     }
+
+    
 }

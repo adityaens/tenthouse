@@ -70,16 +70,29 @@
                                         value="{{ request()->get('name') }}">
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label for="discount" class="form-label">{{ __('Discount(%)') }}</label>
-                                    <select name="discount" id="discount"
-                                        class="form-control custom-select @error('discount') is-invalid @enderror">
-                                        <option value="">Select Option</option>
-                                        @foreach($groups as $id => $name)
-                                        <option value="{{ $id }}" {{ request('discount') == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="group">{{ __('Group') }}</label>
+                                        <div class="d-flex">
+                                            @foreach($groups as $key => $group)                                           
+                                            <div class="form-check mr-2">
+                                                <input class="form-check-input"
+                                                    name="group[]"
+                                                    type="checkbox"
+                                                    id="inlineCheckbox{{$key}}"
+                                                    value="{{$key}}" 
+                                                    {{ in_array($key, old('group', [])) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group}}</label>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        @error('group')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
+
+
 
                                 <div class="col-md-6 mb-3">
                                     <label for="status" class="form-label">{{ __('Status') }}</label>
@@ -114,9 +127,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Mobile</th>
-                                    <th>Discount(%)</th>
-                                    <!-- <th>Email</th> -->
-                                    <!-- <th>Address</th> -->
+                                    <th>Group</th>
                                     <th>Status</th>
                                     <th>Created At</th>
                                     <th>Action</th>
@@ -128,9 +139,11 @@
                                 <tr>
                                     <td>{{ $user->name ?? '' }}</td>
                                     <td>{{ $user->mobile ?? '' }}</td>
-                                    <td>{{$user->group->name ?? ''}}</td>
-                                    <!-- <td>{{$user->email ?? ''}}</td> -->
-                                    <!-- <td>{{$user->address ?? ''}}</td> -->
+                                    <td>
+                                        @foreach($user->groups as $groupName)
+                                        {{$groupName->name ?? ''}}{{ $loop->last ? '' : ', ' }}
+                                        @endforeach
+                                    </td>
                                     <td> <span class="{{$user->status ? 'p-2 badge bg-success':'p-2 badge bg-danger'}}"> {{$user->status ? 'Active' : 'Inactive'}}</span></td>
                                     <td>{{$user->created_at ?? ''}}</td>
 
