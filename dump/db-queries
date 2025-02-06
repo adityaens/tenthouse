@@ -69,3 +69,4 @@ ALTER TABLE `orders` ADD `missing` INT(11) NOT NULL DEFAULT '0' AFTER `quantity`
 ALTER TABLE `products` ADD `sku` VARCHAR(50) NOT NULL AFTER `id`;
 
 ALTER TABLE `orders` ADD `quantity` INT NULL DEFAULT NULL AFTER `payment_method_id`;
+ALTER TABLE `tbl_users` CHANGE `group_id` `group_id` VARCHAR(100) NULL DEFAULT NULL;

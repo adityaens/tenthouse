@@ -16,8 +16,8 @@ class Group extends Model
         'status',
     ];
 
-    // public function users()
-    // {
-    //     return $this->hasMany(User::class, 'group_id', 'id');
-    // }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'userid_groupids', 'group_id', 'user_id');
+    }
 }

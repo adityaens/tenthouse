@@ -67,16 +67,18 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-6">  
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="group">Discount(%)</label>
-                                        <select name="group" id="group"
-                                            class="form-control custom-select @error('group') is-invalid @enderror">
-                                            <option value="">Select Option</option>
-                                            @foreach($groups as $id => $name)
-                                            <option value="{{ $id }}" {{ old('group') == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <label for="group">Group</label>
+                                        <div class="d-flex">
+                                            @foreach($groups as $key => $group)
+                                        <div class="form-check mr-2">
+                                            <input class="form-check-input" name="group[]" type="checkbox" id="inlineCheckbox{{$key}}" value="{{$key}}" {{ $loop->first || in_array($key, old('group', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group}}</label>
+                                        </div>
+                                        @endforeach
+                                        
+                                        </div>
                                         @error('group')
                                         <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
