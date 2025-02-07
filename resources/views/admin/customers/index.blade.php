@@ -74,13 +74,13 @@
                                     <div class="form-group">
                                         <label for="group">{{ __('Group') }}</label>
                                         <div class="d-flex">
-                                            @foreach($groups as $key => $group)                                           
+                                            @foreach($groups as $key => $group)
                                             <div class="form-check mr-2">
                                                 <input class="form-check-input"
                                                     name="group[]"
                                                     type="checkbox"
                                                     id="inlineCheckbox{{$key}}"
-                                                    value="{{$key}}" 
+                                                    value="{{$key}}"
                                                     {{ is_array(request()->get('group')) && in_array($key, request()->get('group')) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group}}</label>
                                             </div>
@@ -93,97 +93,96 @@
                                 </div>
 
 
-
+                                {{--
                                 <div class="col-md-6 mb-3">
                                     <label for="status" class="form-label">{{ __('Status') }}</label>
-                                    <select name="status" id="status" class="form-control">
-                                        <option value="">{{ __('Select Status') }}</option>
-                                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
-                                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="created_on" class="form-label">{{ __('Created At') }}</label>
-                                    <input type="date" class="form-control" name="created_on" id="created_on"
-                                        value="{{ request()->get('created_on') }}">
-                                </div>
+                                <select name="status" id="status" class="form-control">
+                                    <option value="">{{ __('Select Status') }}</option>
+                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                </select>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-12 d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary me-2">{{ __('Search') }}</button>
-                                    <a href="{{ route('admin.user.index') }}" class="btn btn-secondary">{{ __('Reset') }}</a>
-                                </div>
+                            --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="created_on" class="form-label">{{ __('Created At') }}</label>
+                                <input type="date" class="form-control" name="created_on" id="created_on"
+                                    value="{{ request()->get('created_on') }}">
                             </div>
-                        </form>
-
-
-                        <hr />
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Mobile</th>
-                                    <th>Group</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($users as $key => $user)
 
-                                <tr>
-                                    <td>{{ $user->name ?? '' }}</td>
-                                    <td>{{ $user->mobile ?? '' }}</td>
-                                    <td>
-                                        @foreach($user->groups as $groupName)
-                                        {{$groupName->name ?? ''}}{{ $loop->last ? '' : ', ' }}
-                                        @endforeach
-                                    </td>
-                                    <td> <span class="{{$user->status ? 'p-2 badge bg-success':'p-2 badge bg-danger'}}"> {{$user->status ? 'Active' : 'Inactive'}}</span></td>
-                                    <td>{{$user->created_at ?? ''}}</td>
-
-                                    <td>
-                                        <!-- Edit Button -->
-                                        <a href="{{route('admin.user.edit',['id'=>$user->userId])}}" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-
-                                        <!-- Delete Button -->
-                                        <form id="delete-form-{{ $user->userId }}" action="{{ route('admin.user.destroy', ['id' => $user->userId]) }}" method="POST" style="display: inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $user->userId }})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7"><span class="">No Customer to show</span></td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                        @if ($users->count() > 0)
-                        <div class="pagination_wrapper">
-                            {{ $users->appends(request()->query())->links() }}
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary me-2">{{ __('Search') }}</button>
+                            <a href="{{ route('admin.user.index') }}" class="btn btn-secondary">{{ __('Reset') }}</a>
                         </div>
-                        @endif
-
                     </div>
+                    </form>
+
+
+                    <hr />
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Group</th>
+                           
+                                <th>Created At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($users as $key => $user)
+
+                            <tr>
+                                <td>{{ $user->name ?? '' }}</td>
+                                <td>{{ $user->mobile ?? '' }}</td>
+                                <td>
+                                    @foreach($user->groups as $groupName)
+                                    {{$groupName->name ?? ''}}{{ $loop->last ? '' : ', ' }}
+                                    @endforeach
+                                </td>
+                                <td>{{$user->created_at ?? ''}}</td>
+
+                                <td>
+                                    <!-- Edit Button -->
+                                    <a href="{{route('admin.user.edit',['id'=>$user->userId])}}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <form id="delete-form-{{ $user->userId }}" action="{{ route('admin.user.destroy', ['id' => $user->userId]) }}" method="POST" style="display: inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $user->userId }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7"><span class="">No Customer to show</span></td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    @if ($users->count() > 0)
+                    <div class="pagination_wrapper">
+                        {{ $users->appends(request()->query())->links() }}
+                    </div>
+                    @endif
+
                 </div>
             </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

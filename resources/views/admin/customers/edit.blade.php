@@ -69,59 +69,81 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="group">Discount(%)</label>
-                                        <select name="group" id="group"
-                                            class="form-control custom-select @error('group') is-invalid @enderror">
-                                            <option value="">Select Option</option>
-                                            @foreach($groups as $id => $name)
-                                            <option value="{{ $id }}" {{ old('group', $user->group_id ?? null) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                        <label for="group">Group</label>
+                                        <div class="d-flex">
+                                            @php
+                                            $groupName =$user->groups->pluck('id')->toArray();
+                                            @endphp
+                                            @foreach($groups as $key => $group)
+                                            <div class="form-check mr-2">
+                                                <input class="form-check-input" name="group[]" type="checkbox" id="inlineCheckbox{{$key}}" value="{{$key}}" {{ in_array($key,  $groupName ) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group}}</label>
+                                            </div>
                                             @endforeach
-                                        </select>
+
+                                        </div>
                                         @error('group')
                                         <span class="error invalid-feedback">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                {{-- <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="address">Address</label>
-                                        <textarea name="address" id="address"
-                                            class="form-control @error('address') is-invalid @enderror"
-                                            rows="4" placeholder="Enter Address">{{ old('address', $user->address ?? '') }}</textarea>
-                                        @error('address')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="status">Status</label>
-                                        <select name="status" id="status"
-                                            class="form-control custom-select @error('status') is-invalid @enderror">
-                                            <option value="">Select Status</option>
-                                            <option value="1" {{ old('status' , $user->status ?? '') == '1' ? 'selected' : '' }}>Active</option>
-                                            <option value="0" {{ old('status' , $user->status ?? '') == '0' ? 'selected' : '' }}>Inactive</option>
-                                        </select>
-                                        @error('status')
-                                        <span class="error invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
+                                        <label for="group">Group</label>
+                                        <div class="d-flex">
+                                            @foreach($user->groups as $key => $group)
+                                            <div class="form-check mr-2">                                                
+                                            <input class="form-check-input" name="group[]" type="checkbox" id="inlineCheckbox{{$key}}" value="{{$key}}" {{old('group') ? (in_array($key, old('group', [])) ? 'checked' : '' ) : 'checked' }}>
+                                <label class="form-check-label" for="inlineCheckbox{{$key}}">{{$group->name}}</label>
                             </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-success">Update</button>
-                                    <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.user.index') }}'">Back</button>
-                                </div>
-                            </div>
-                        </form>
+                            @endforeach
                     </div>
+                    @error('group')
+                    <span class="error invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div> --}}
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea name="address" id="address"
+                        class="form-control @error('address') is-invalid @enderror"
+                        rows="4" placeholder="Enter Address">{{ old('address', $user->address ?? '') }}</textarea>
+                    @error('address')
+                    <span class="error invalid-feedback">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
+
+            {{--
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status"
+                        class="form-control custom-select @error('status') is-invalid @enderror">
+                        <option value="">Select Status</option>
+                        <option value="1" {{ old('status' , $user->status ?? '') == '1' ? 'selected' : '' }}>Active</option>
+            <option value="0" {{ old('status' , $user->status ?? '') == '0' ? 'selected' : '' }}>Inactive</option>
+            </select>
+            @error('status')
+            <span class="error invalid-feedback">{{ $message }}</span>
+            @enderror
         </div>
-    </section>
+</div>
+--}}
+</div>
+<div class="row">
+    <div class="col-12">
+        <button type="submit" class="btn btn-success">Update</button>
+        <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.user.index') }}'">Back</button>
+    </div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</section>
 </div><!-- /.container-fluid -->
 </div>
 <!-- /.content -->
