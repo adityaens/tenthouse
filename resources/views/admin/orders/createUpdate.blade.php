@@ -77,8 +77,8 @@
                             <div class="row mb-4">
                                 <div class="col-md-5">
                                     <label for="user" class="form-label fw-bold">Customer</label>
-                                    <input type="hidden" id="userId">
-                                    <input type="text" id="user" placeholder="Type to search...">
+                                    <input type="hidden" id="userId" value="{{ $order->user_id }}">
+                                    <input type="text" id="user" placeholder="Type to search..." value="{{ $order->user->name ?? '' }}" disabled>
                                     <div id="results1" class="user-list"></div>
                                 </div>
                                 <div class="col-md-5">
@@ -105,8 +105,51 @@
                             <!-- Cart List -->
                             <div class="row">
                                 <div class="col-12">
+                                    <div id="cart_list_old" class="table-responsive border rounded p-3 bg-light">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>SKU</th>
+                                                        <th>Unit Price</th>
+                                                        <th>Qty</th>
+                                                        <th>Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse ($order->orderProducts as $op)
+                                                    <tr>
+                                                        <td>{{ $op->product_name ?? '' }}</td>
+                                                        <td>{{ $op->sku ?? '' }}</td>
+                                                        <td>{{ $op->unit_price ?? '' }}</td>
+                                                        <td>{{ $op->quantity ?? '' }}</td>
+                                                        <td>{{ $op->total_price ?? '' }}</td>
+                                                    </tr>
+                                                    @empty
+
+                                                    @endforelse
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Total Qty: {{$order->quantity}}</td>
+                                                        <td>Total Price: {{CURRENCY_SYMBOL}}{{$order->total_amount}}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row">
+                                <div class="col-12">
                                     <div id="cart_list" class="table-responsive border rounded p-3 bg-light">
-                                        <!-- Cart items will be dynamically added here -->
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +233,7 @@
             const div = document.createElement("div");
             const productId = document.getElementById('productId');
             div.classList.add("product");
-            div.textContent = product.name+'('+product.rem_qty+')';
+            div.textContent = product.name + '(' + product.rem_qty + ')';
             div.onclick = function() {
                 productId.value = product.id;
                 selectProduct(product);
@@ -204,7 +247,7 @@
     // Function to handle product selection
     function selectProduct(product) {
         let productInput = document.getElementById("product");
-        productInput.value = product.name+'('+product.rem_qty+')'; // Fill input field
+        productInput.value = product.name + '(' + product.rem_qty + ')'; // Fill input field
         document.getElementById("results").style.display = "none"; // Hide suggestions
     }
 
@@ -286,7 +329,7 @@
         let userInput = document.getElementById("user");
         userInput.value = user.name; // Fill input field
         document.getElementById("userId").value = user.userId; // Set userId value
-        document.getElementById("group_name").innerHTML = 'Groups: '+user.groups.map(item => item.name).join(', ');
+        document.getElementById("group_name").innerHTML = 'Groups: ' + user.groups.map(item => item.name).join(', ');
         document.getElementById("results1").style.display = "none"; // Hide suggestions
     }
 
@@ -319,12 +362,12 @@
                 return;
             }
 
-            if(!userId) {
+            if (!userId) {
                 toastr.error('Select User.')
                 return;
             }
 
-            if(!quantity) {
+            if (!quantity) {
                 toastr.error('Select Quantity');
                 return;
             }
@@ -531,7 +574,7 @@
 
         // Send FormData via AJAX
         $.ajax({
-            url: '{{ route("admin.orders.store") }}', // Adjust the endpoint as needed
+            url: '{{ route("admin.orders.storeUpdate", ["id" => $order->id]) }}', // Adjust the endpoint as needed
             type: 'POST',
             data: formData,
             processData: false,

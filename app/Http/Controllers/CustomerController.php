@@ -136,6 +136,7 @@ class CustomerController extends Controller
                 'userId',
                 'name'
             ])
+            ->with('groups')
             ->where('status', ACTIVE)
             ->where('roleId', CUSTOMER)
             ->where('name', 'like', $customerKeyword .'%')

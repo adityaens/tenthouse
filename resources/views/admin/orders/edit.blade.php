@@ -171,8 +171,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-success">Update</button>
-                                    {{--<button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.orders.index') }}'">Back</button>--}}
-                                </div>
+                                    <button type="button" class="btn btn-secondary reset-btn" onclick="window.location.href='{{ route('admin.orders.createUpdate', [$order->id]) }}'">Back</button>
                             </div>
                         </form>
                     </div>
