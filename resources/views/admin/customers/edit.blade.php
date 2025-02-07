@@ -70,7 +70,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="group">Group</label>
-                                        <div class="d-flex">
+                                        <div class="d-flex flex-wrap">
                                             @php
                                             $groupName =$user->groups->pluck('id')->toArray();
                                             @endphp

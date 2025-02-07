@@ -32,17 +32,16 @@ class CustomerController extends Controller
     if ($request->filled('name')) {
         $query->where('name', 'like', '%' . $request->name . '%');
     }
+    if ($request->filled('mobile')) {
+        $query->where('mobile', 'like', '%' . $request->mobile . '%');
+    }
     
     if ($request->filled('group')) {
         $query->whereHas('groups', function ($query) use ($request) {
             $query->whereIn('group_id', (array)$request->group);
         });
     }
-    
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-    
+        
     if ($request->filled('created_on')) {
         $query->whereDate('created_at', '=', $request->created_on);
     }

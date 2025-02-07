@@ -70,10 +70,17 @@
                                         value="{{ request()->get('name') }}">
                                 </div>
 
+                                <div class="col-md-6 mb-3">
+                                    <label for="mobile" class="form-label">{{ __('Mobile') }}</label>
+                                    <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Enter Mobile"
+                                        value="{{ request()->get('mobile') }}">
+                                </div>
+
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="group">{{ __('Group') }}</label>
-                                        <div class="d-flex">
+                                        <div class="d-flex flex-wrap">
                                             @foreach($groups as $key => $group)
                                             <div class="form-check mr-2">
                                                 <input class="form-check-input"
@@ -128,7 +135,7 @@
                                 <th>Name</th>
                                 <th>Mobile</th>
                                 <th>Group</th>
-                           
+                                <th>Group Description</th>                           
                                 <th>Created At</th>
                                 <th>Action</th>
                             </tr>
@@ -142,6 +149,11 @@
                                 <td>
                                     @foreach($user->groups as $groupName)
                                     {{$groupName->name ?? ''}}{{ $loop->last ? '' : ', ' }}
+                                    @endforeach
+                                </td>
+                                <td>
+                                    @foreach($user->groups as $groupName)
+                                    {{$groupName->description ?? ''}}{{ $loop->last ? '' : ', ' }}
                                     @endforeach
                                 </td>
                                 <td>{{$user->created_at ?? ''}}</td>

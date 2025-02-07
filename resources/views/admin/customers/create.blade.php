@@ -70,7 +70,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="group">Group</label>
-                                        <div class="d-flex">
+                                        <div class="d-flex flex-wrap">
                                             @foreach($groups as $key => $group)
                                         <div class="form-check mr-2">
                                             <input class="form-check-input" name="group[]" type="checkbox" id="inlineCheckbox{{$key}}" value="{{$key}}" {{ $loop->first || in_array($key, old('group', [])) ? 'checked' : '' }}>
