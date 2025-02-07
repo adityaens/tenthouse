@@ -197,6 +197,4 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Group::class, 'userid_groupids', 'user_id', 'group_id');
     }
-
-    
 }

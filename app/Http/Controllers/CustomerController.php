@@ -57,10 +57,10 @@ class CustomerController extends Controller
     
     public function create()
     {
-
         $groups = Group::where('status',1)->pluck('name', 'id');
         return view('admin.customers.create', ['groups' => $groups]);
     }
+
     public function store(CustomerRequest $request)
     {
         
@@ -85,23 +85,25 @@ class CustomerController extends Controller
         }
     }
     public function edit(Request $request) {
-        $groups=Group::where('status',1)->pluck('name','id');
-        $user=User::where('userId',$request->id)->first();
-  
-        return view('admin.customers.edit', compact('groups','user'));
+
+        $groups = Group::where('status',1)->pluck('name', 'id');
+        $user=User::with('groups')->where('userId',$request->id)->first();
+
+        return view('admin.customers.edit', compact('user','groups'));
     }
-    public function update(CustomerRequest $request) {
-     
+
+    public function update(CustomerRequest $request) {   
+
         $user=User::where('userId', $request->id)->first();
-        $user->update([            
-            'group_id' => $request->group,
+        $user->update([ 
             'email' => $request->email,            
             'name' => $request->name,
             'mobile' => $request->mobile,
             'address' => $request->address,
-            'status' => $request->status
+            
         ]);
         if($user){
+          $user->groups()->sync($request->group);
           return redirect()->route('admin.user.index')->with('success','Customer updated successfully');
         }else{
           return redirect()->route('admin.user.index')->with('error','Something went wrong');
