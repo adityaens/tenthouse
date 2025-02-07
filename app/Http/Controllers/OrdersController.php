@@ -184,6 +184,16 @@ class OrdersController extends Controller
                         'quantity' => $orderProduct['quantity'],
                         'total_price' => $orderProduct['totalPrice']
                     ]);
+
+                    $product = Product::find($orderProduct['productId']);
+                    $usedQty = (int)$product->used_qty;
+                    $usedQty += $quantity;
+                    $remQty = (int)$product->rem_qty;
+                    $remQty -= $quantity;
+
+                    $product->used_qty = $usedQty;
+                    $product->rem_qty = $remQty;
+                    $product->update();
                 }
                 $order->total_amount = $totalPrice;
                 $order->quantity = $totalQty;
