@@ -138,6 +138,47 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function createUpdate($id)
+    {
+        $customers = User::select([
+            'userId',
+            'name',
+        ])
+            ->where([
+                'roleId' => 2,
+                'status' => ACTIVE
+            ])
+            ->get();
+
+        $products = Product::select([
+            'id',
+            'name',
+            'price',
+            'rem_qty'
+        ])
+            ->where('status', ACTIVE)
+            ->where('rem_qty', '>', 0)
+            ->get();
+
+        $paymentMethods = PaymentModel::select([
+            'id',
+            'pay_mod'
+        ])
+            ->get();
+
+        $order = Order::with('orderProducts', 'user')
+            ->where('id', $id)
+            ->first();
+            
+
+        return view('admin.orders.createUpdate', [
+            'order' => $order,
+            'customers' => $customers,
+            'products' => $products,
+            'paymentMethods' => $paymentMethods
+        ]);
+    }
+
     /**
      * Store Orders
      * 
@@ -209,6 +250,87 @@ class OrdersController extends Controller
             return response()->json([
                 'success' => true,
                 'orderId' => $order->id,
+                'message' => 'Order created.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+
+     /**
+     * Store Orders 
+     * 
+     * @param \App\Http\Requests\OrderRequest;
+     * @param int $id;
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeUpdate(Request $request, $id)
+    {
+        try {
+            $totalPrice = 0;
+            $totalQty = 0;
+            $userId = $request->input('userId');
+            if (!$request->has('userId')) {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'User NOT found.'),
+                ]);
+            }
+
+            $orderProducts = json_decode($request->input('cartItems'), true);
+
+                foreach ($orderProducts as $orderProduct) {
+                    // Ensure that unitPrice and quantity are properly converted to float
+                    $unitPrice = (int)$orderProduct['unitPrice'];
+                    $quantity = (int)$orderProduct['quantity'];
+
+                    // // Calculate total price for this product and update totalPrice
+                    $productTotalPrice = $unitPrice * $quantity;
+                    $totalPrice += $productTotalPrice;
+                    $totalQty += $quantity;
+
+                    $orderProductDb = OrderProduct::where([
+                        'order_id' => $id,
+                        'product_id' => $orderProduct['productId']
+                        ])
+                        ->first();
+
+                    if($orderProductDb) {
+                        $orderProductDb->update([
+                            'quantity' => (int)$orderProductDb->quantity + (int)$orderProduct['quantity'],
+                            'total_price' => (int)$orderProductDb->total_price + (int)$orderProduct['totalPrice']
+                        ]);
+                    } else {
+                        OrderProduct::create([
+                            'order_id' => $id,
+                            'product_id' => $orderProduct['productId'],
+                            'product_name' => $orderProduct['productName'],
+                            'sku' => $orderProduct['sku'],
+                            'unit_price' => $orderProduct['unitPrice'],
+                            'quantity' => $orderProduct['quantity'],
+                            'total_price' => $orderProduct['totalPrice']
+                        ]);
+                    }
+
+                    $product = Product::find($orderProduct['productId']);
+                    $usedQty = (int)$product->used_qty;
+                    $usedQty += $quantity;
+                    $remQty = (int)$product->rem_qty;
+                    $remQty -= $quantity;
+
+                    $product->used_qty = $usedQty;
+                    $product->rem_qty = $remQty;
+                    $product->update();
+                }
+                Cart::truncate();
+
+            return response()->json([
+                'success' => true,
+                'orderId' => $id,
                 'message' => 'Order created.'
             ]);
         } catch (Exception $e) {
