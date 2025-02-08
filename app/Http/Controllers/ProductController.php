@@ -119,7 +119,7 @@ class ProductController extends Controller
             $product->quantity = $request->input('quantity');
             $product->used_qty = 0;
             $product->rem_qty = $request->input('quantity');
-            $product->status = $request->input('status');
+            $product->status = $request->input('status') ? $request->input('status') : 1;
             $product->product_condition = $request->input('product_condition');
 
             $isSaved = $product->save();

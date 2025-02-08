@@ -37,7 +37,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="name">Name</label>
+                                        <label for="name">Name <span class="text-danger">*</span></label>
                                         <input type="text" name="name" id="name"
                                             class="form-control @error('name') is-invalid @enderror"
                                             placeholder="Enter Name" value="{{ old('name') }}">
@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="category">Category</label>
+                                        <label for="category">Category <span class="text-danger">*</span></label>
                                         <select name="cat_id" id="cat_id"
                                             class="form-control custom-select @error('cat_id') is-invalid @enderror">
                                             <option value="">Select Category</option>
@@ -85,7 +85,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="price">Price</label>
+                                        <label for="price">Price <span class="text-danger">*</span></label>
                                         <input type="text" name="price" id="price"
                                             class="form-control @error('price') is-invalid @enderror"
                                             placeholder="Enter price in Rs" value="{{ old('price') }}">
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="quantity">Quantity</label>
+                                        <label for="quantity">Quantity <span class="text-danger">*</span></label>
                                         <input type="number" name="quantity" id="quantity"
                                             class="form-control @error('quantity') is-invalid @enderror"
                                             placeholder="Enter Quantity" value="{{ old('quantity') }}">
@@ -125,7 +125,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="product_condition">Product Condition</label>
+                                        <label for="product_condition">Product Condition <span class="text-danger">*</span></label>
                                         <input type="text" name="product_condition" id="product_condition"
                                             class="form-control @error('product_condition') is-invalid @enderror"
                                             placeholder="Enter Product Condition" value="{{ old('product_condition') }}">

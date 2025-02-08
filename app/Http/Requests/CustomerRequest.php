@@ -23,9 +23,10 @@ class CustomerRequest extends FormRequest
      */
     public function rules()
     {
+        $userId = $this->route('id');
         return [
             'name'=>'required',
-            'mobile'=>'required|digits:10',
+           'mobile' => 'required|digits:10|unique:tbl_users,mobile,' . $userId . ',userId',
             'group' => 'required'
         ];
     }
