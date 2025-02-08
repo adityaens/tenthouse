@@ -25,12 +25,10 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'cat_id' => 'required|numeric',
-            'description' => 'required|string',
+            'cat_id' => 'required|numeric',            
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|numeric|min:0',
-            'product_condition' => 'required|string',
-            'status' => 'required|boolean',
+            'product_condition' => 'required|string',            
             'product_images' => 'nullable|array', 
             'product_images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120', 
     
