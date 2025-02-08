@@ -134,7 +134,8 @@ class CustomerController extends Controller
 
             $customers = User::select([
                 'userId',
-                'name'
+                'name',
+                'mobile'
             ])
             ->with('groups')
             ->where('status', ACTIVE)

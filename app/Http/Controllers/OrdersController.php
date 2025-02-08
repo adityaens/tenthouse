@@ -273,6 +273,8 @@ class OrdersController extends Controller
         try {
             $totalPrice = 0;
             $totalQty = 0;
+            $orderTotal = 0;
+            $orderQty = 0;
             $userId = $request->input('userId');
             if (!$request->has('userId')) {
                 return response()->json([
@@ -288,10 +290,12 @@ class OrdersController extends Controller
                 $unitPrice = (int)$orderProduct['unitPrice'];
                 $quantity = (int)$orderProduct['quantity'];
 
-                // // Calculate total price for this product and update totalPrice
+                // Calculate total price for this product and update totalPrice
                 $productTotalPrice = $unitPrice * $quantity;
                 $totalPrice += $productTotalPrice;
                 $totalQty += $quantity;
+                $orderTotal += $totalPrice;
+                $orderQty += $totalQty;
 
                 $orderProductDb = OrderProduct::where([
                     'order_id' => $id,
@@ -315,6 +319,14 @@ class OrdersController extends Controller
                         'total_price' => $orderProduct['totalPrice']
                     ]);
                 }
+
+                $order = Order::find($id);
+                $oldQty = $order->quantity;
+                $oldTotalPrice = $order->total_amount;
+    
+                $order->quantity = $oldQty + $orderQty;
+                $order->total_amount = $oldTotalPrice + $orderTotal;
+                $order->update();
 
                 $product = Product::find($orderProduct['productId']);
                 $usedQty = (int)$product->used_qty;

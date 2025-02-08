@@ -108,10 +108,7 @@
                                             <td>{{ $orderProduct->product_name }}</td>
                                             <td>{{ $orderProduct->sku }}</td>
                                             <td>{{ CURRENCY_SYMBOL }}{{ $orderProduct->unit_price }}</td>
-                                            <td>
-                                                <input type="number" class="form-control quantity text-center" data-index="{{ $orderProduct->id }}"
-                                                    value="{{ $orderProduct->quantity }}" min="1" style="width: 60px;">
-                                            </td>
+                                            <td>{{ $orderProduct->quantity }}</td>
                                             <td class="total-price">{{ CURRENCY_SYMBOL }}{{ $orderProduct->total_price }}</td>
                                             {{--<td>
                                                 <button class="btn btn-danger btn-sm remove-item" data-index="{{ $orderProduct->id }}">

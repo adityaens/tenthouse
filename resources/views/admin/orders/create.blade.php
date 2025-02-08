@@ -445,7 +445,7 @@
         filteredUsers.forEach(user => {
             const div = document.createElement("div");
             div.classList.add("user");
-            div.textContent = user.name;
+            div.textContent = `${user.name} (${user.mobile})`;
             div.onclick = function() {
                 selectProduct1(user); // Pass both name and ID
             };
@@ -458,7 +458,7 @@
     // Function to handle product selection
     function selectProduct1(user) {
         let userInput = document.getElementById("user");
-        userInput.value = user.name; // Fill input field
+        userInput.value = `${user.name} (${user.mobile})`; // Fill input field
         document.getElementById("userId").value = user.userId; // Set userId value
         document.getElementById("group_name").innerHTML = 'Groups: ' + user.groups.map(item => item.name).join(', ');
         document.getElementById("results1").style.display = "none"; // Hide suggestions
@@ -583,7 +583,7 @@
                 <td>₹${item.unitPrice}</td>
                 <td>
                     <input type="number" class="form-control quantity text-center" data-index="${index}" 
-                           value="${item.quantity}" min="1" style="width: 60px;">
+                           value="${item.quantity}" min="1" style="width: 60%;">
                 </td>
                 <td class="total-price">₹${item.totalPrice}</td>
                 <td>

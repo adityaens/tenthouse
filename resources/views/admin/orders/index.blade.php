@@ -182,7 +182,7 @@
                                         </a>
 
                                         <!-- Edit Button -->
-                                        <a href="{{ route('admin.orders.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ route('admin.orders.createUpdate', ['id' => $order->id]) }}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
