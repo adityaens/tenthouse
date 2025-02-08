@@ -169,7 +169,7 @@ class OrdersController extends Controller
         $order = Order::with('orderProducts', 'user')
             ->where('id', $id)
             ->first();
-            
+
 
         return view('admin.orders.createUpdate', [
             'order' => $order,
@@ -261,7 +261,7 @@ class OrdersController extends Controller
     }
 
 
-     /**
+    /**
      * Store Orders 
      * 
      * @param \App\Http\Requests\OrderRequest;
@@ -283,50 +283,50 @@ class OrdersController extends Controller
 
             $orderProducts = json_decode($request->input('cartItems'), true);
 
-                foreach ($orderProducts as $orderProduct) {
-                    // Ensure that unitPrice and quantity are properly converted to float
-                    $unitPrice = (int)$orderProduct['unitPrice'];
-                    $quantity = (int)$orderProduct['quantity'];
+            foreach ($orderProducts as $orderProduct) {
+                // Ensure that unitPrice and quantity are properly converted to float
+                $unitPrice = (int)$orderProduct['unitPrice'];
+                $quantity = (int)$orderProduct['quantity'];
 
-                    // // Calculate total price for this product and update totalPrice
-                    $productTotalPrice = $unitPrice * $quantity;
-                    $totalPrice += $productTotalPrice;
-                    $totalQty += $quantity;
+                // // Calculate total price for this product and update totalPrice
+                $productTotalPrice = $unitPrice * $quantity;
+                $totalPrice += $productTotalPrice;
+                $totalQty += $quantity;
 
-                    $orderProductDb = OrderProduct::where([
+                $orderProductDb = OrderProduct::where([
+                    'order_id' => $id,
+                    'product_id' => $orderProduct['productId']
+                ])
+                    ->first();
+
+                if ($orderProductDb) {
+                    $orderProductDb->update([
+                        'quantity' => (int)$orderProductDb->quantity + (int)$orderProduct['quantity'],
+                        'total_price' => (int)$orderProductDb->total_price + (int)$orderProduct['totalPrice']
+                    ]);
+                } else {
+                    OrderProduct::create([
                         'order_id' => $id,
-                        'product_id' => $orderProduct['productId']
-                        ])
-                        ->first();
-
-                    if($orderProductDb) {
-                        $orderProductDb->update([
-                            'quantity' => (int)$orderProductDb->quantity + (int)$orderProduct['quantity'],
-                            'total_price' => (int)$orderProductDb->total_price + (int)$orderProduct['totalPrice']
-                        ]);
-                    } else {
-                        OrderProduct::create([
-                            'order_id' => $id,
-                            'product_id' => $orderProduct['productId'],
-                            'product_name' => $orderProduct['productName'],
-                            'sku' => $orderProduct['sku'],
-                            'unit_price' => $orderProduct['unitPrice'],
-                            'quantity' => $orderProduct['quantity'],
-                            'total_price' => $orderProduct['totalPrice']
-                        ]);
-                    }
-
-                    $product = Product::find($orderProduct['productId']);
-                    $usedQty = (int)$product->used_qty;
-                    $usedQty += $quantity;
-                    $remQty = (int)$product->rem_qty;
-                    $remQty -= $quantity;
-
-                    $product->used_qty = $usedQty;
-                    $product->rem_qty = $remQty;
-                    $product->update();
+                        'product_id' => $orderProduct['productId'],
+                        'product_name' => $orderProduct['productName'],
+                        'sku' => $orderProduct['sku'],
+                        'unit_price' => $orderProduct['unitPrice'],
+                        'quantity' => $orderProduct['quantity'],
+                        'total_price' => $orderProduct['totalPrice']
+                    ]);
                 }
-                Cart::truncate();
+
+                $product = Product::find($orderProduct['productId']);
+                $usedQty = (int)$product->used_qty;
+                $usedQty += $quantity;
+                $remQty = (int)$product->rem_qty;
+                $remQty -= $quantity;
+
+                $product->used_qty = $usedQty;
+                $product->rem_qty = $remQty;
+                $product->update();
+            }
+            Cart::truncate();
 
             return response()->json([
                 'success' => true,
@@ -571,6 +571,71 @@ class OrdersController extends Controller
             ]);
         } else {
             return redirect()->route('admin.orders.index')->with('error', showErrorMessage($this->debugMode, 'Order not found'));
+        }
+    }
+
+    public function createOtherDetails(Request $request)
+    {
+        $isUpdated = false;
+        $id = $request->input('orderId');
+        $oldData = [];
+        $newData = [];
+
+        if (empty($id)) {
+            return redirect()->route('admin.orders.index')->with('error', showErrorMessage($this->debugMode, 'Id not found'));
+        }
+
+        $dates = $this->parseBookingDateRange($request->input('booking_date_range'));
+
+        try {
+            $order = Order::find($id);
+
+            if (($request->input('due_amount') < 0) || ($request->input('paid_amount') < 0)) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Due/Paid amount less than Zero'));
+            }
+
+            $oldData = $this->getOrderLogDataArray($order);
+
+            if ($request->has('payment_method')) {
+                $order->payment_method_id = $request->input('payment_method');
+            }
+            if ($request->has('booking_date_range')) {
+                $order->booking_date_from = $dates['start'];
+                $order->booking_date_to = $dates['end'];
+            }
+            if ($request->has('paid_amount')) {
+                $order->paid_amount = $request->input('paid_amount');
+            }
+            if ($request->has('due_amount')) {
+                $order->due_amount = $request->input('due_amount');
+            }
+            if ($request->has('due_date')) {
+                $order->due_date = $request->input('due_date');
+            }
+            if ($request->has('status')) {
+                $order->status = $request->input('status');
+            }
+            if ($request->has('delivered_by')) {
+                $order->delivered_by = $request->input('delivered_by');
+            }
+            if ($request->has('remarks')) {
+                $order->remarks = $request->input('remarks');
+            }
+
+            $isUpdated = $order->update();
+
+            if (!$isUpdated) {
+                return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'Order not updated.'));
+            }
+
+            if ($isUpdated) {
+                $newData = $this->getOrderLogDataArray($order);
+                $this->createOrderLogs($id, $oldData, $newData);
+            }
+
+            return redirect()->route('admin.orders.index')->with('success', 'Order modified successfully.');
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
         }
     }
 }

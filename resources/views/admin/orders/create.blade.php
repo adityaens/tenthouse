@@ -20,10 +20,6 @@
         color: #fff;
     }
 
-    #create_order {
-        display: none;
-    }
-
     #product,
     #user {
         width: 100%;
@@ -65,7 +61,7 @@
     <!-- /.content-header -->
     <section class="content">
         @include('components.alert')
-        <div class="row">
+        <div class="row" id="main_row">
             <div class="col-md-12">
                 <div class="card card-primary">
 
@@ -96,14 +92,14 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row" id="group_row">
                                 <div class="col-md-4">
                                     <p id="group_name"></p>
                                 </div>
                             </div>
 
                             <!-- Cart List -->
-                            <div class="row">
+                            <div class="row" id="cart_row">
                                 <div class="col-12">
                                     <div id="cart_list" class="table-responsive border rounded p-3 bg-light">
                                         <!-- Cart items will be dynamically added here -->
@@ -111,14 +107,163 @@
                                 </div>
                             </div>
 
-                            <div class="row" id="create_order">
+
+
+
+                            {{--<div class="row" id="create_order">
                                 <div class="col">
                                     <button type="button" class="btn btn-submit mt-2">Next</button>
                                 </div>
-                            </div>
+                            </div>--}}
                         </div>
                     </div>
 
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="other_details">
+            <div class="col-md-12">
+                <div class="card card-primary">
+
+                    <div class="card-body">
+                        <form action="{{ route('admin.orders.createOtherDetails') }}" method="POST" id="other_details_form">
+                            @csrf
+
+                            <input type="hidden" name="orderId" id="orderId">
+
+                            <!-- Row for Description -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="paymentMethod">Payment Method<span class="text-danger">*</span></label>
+                                        <select name="payment_method" id="payment_method"
+                                            class="form-control custom-select @error('payment_method') is-invalid @enderror">
+                                            <option value="">Select</option>
+                                            @forelse($paymentMethods as $paymentMethod)
+                                            <option {{ (old('payment_method') == $paymentMethod->id) ? 'selected' : '' }} value="{{ $paymentMethod->id }}">
+                                                {{ $paymentMethod->pay_mod }}
+                                            </option>
+                                            @empty
+                                            @endforelse
+                                        </select>
+                                        @error('payment_method')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="booking_date_range">Booking Date Range<span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control float-right @error('booking_date_range') is-invalid @enderror"
+                                                id="booking_date_range"
+                                                name="booking_date_range"
+                                                value="{{ old('booking_date_range') }}">
+                                        </div>
+                                        @error('booking_date_range')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row for Price, Quantity, and Status -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="paid_amount">Paid Amount<span class="text-danger">*</span></label>
+                                        <input type="text" name="paid_amount" id="paid_amount"
+                                            class="form-control @error('paid_amount') is-invalid @enderror"
+                                            placeholder="Enter total amount in Rs" value="{{ old('paid_amount') }}">
+                                        @error('paid_amount')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="due_amount">Due Amount<span class="text-danger">*</span></label>
+                                        <input type="text" name="due_amount" id="due_amount"
+                                            class="form-control @error('due_amount') is-invalid @enderror"
+                                            placeholder="Enter total amount in Rs" value="{{ old('due_amount') }}">
+                                        @error('due_amount')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row for Condition and Image -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="due_date">Due Date<span class="text-danger">*</span></label>
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input @error('due_date') is-invalid @enderror" data-target="#due_date" id="due_date" name="due_date" placeholder="YYYY-MM-DD" value="{{ old('due_date') }}" />
+                                            <div class="input-group-append" data-target="#due_date" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>
+                                        @error('due_date')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="status">Payment Status<span class="text-danger">*</span></label>
+                                        <select name="status" id="status"
+                                            class="form-control custom-select @error('status') is-invalid @enderror">
+                                            <option value="">Select Status</option>
+                                            <option value="{{ COMPLETED }}" {{ old('status') == COMPLETED ? 'selected' : '' }}>Completed</option>
+                                            <option value="{{ PENDNG }}" {{ old('status') == PENDNG ? 'selected' : '' }}>Pending</option>
+                                            <option value="{{ CANCELLED }}" {{ old('status') == CANCELLED ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                        @error('status')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="delivered_by">Delivered By<span class="text-danger">*</span></label>
+                                        <input type="text" name="delivered_by" id="delivered_by"
+                                            class="form-control @error('delivered_by') is-invalid @enderror"
+                                            placeholder="Enter Name" value="{{ old('delivered_by') }}">
+                                        @error('delivered_by')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="remarks">Remarks</label>
+                                        <textarea name="remarks" id="remarks" class="form-control @error('remarks') is-invalid @enderror">{{ old('remarks') }}</textarea>
+                                        @error('remarks')
+                                        <span class="error invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-success final-submit">Submit</button>
+                                    {{--<button type="button" class="btn btn-secondary reset-btn" onclick="">Back</button>--}}
+                                </div>
+                        </form>
+                    </div>
 
                 </div>
             </div>
@@ -134,8 +279,37 @@
 @endsection
 @section('script')
 <link rel="stylesheet" href="{{ asset('css/tempusdominus-bootstrap-4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
+<script src="{{ asset('js/moment.min.js') }}"></script>
+<script src="{{ asset('js/daterangepicker.min.js') }}"></script>
+<script src="{{ asset('js/tempusdominus-bootstrap-4.min.js') }}"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    $(document).ready(function() {
+
+        $('#booking_date_range').daterangepicker({
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
+        });
+
+        $('#due_date').datetimepicker({
+            format: 'YYYY-MM-DD',
+            icons: {
+                time: 'far fa-clock',
+                date: 'far fa-calendar',
+                up: 'fas fa-chevron-up',
+                down: 'fas fa-chevron-down',
+                previous: 'fas fa-chevron-left',
+                next: 'fas fa-chevron-right',
+                today: 'far fa-calendar-check',
+                clear: 'fas fa-trash',
+                close: 'fas fa-times'
+            }
+        })
+    });
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         let productInput = document.getElementById("product");
@@ -190,7 +364,7 @@
             const div = document.createElement("div");
             const productId = document.getElementById('productId');
             div.classList.add("product");
-            div.textContent = product.name+'('+product.rem_qty+')';
+            div.textContent = product.name + '(' + product.rem_qty + ')';
             div.onclick = function() {
                 productId.value = product.id;
                 selectProduct(product);
@@ -204,7 +378,7 @@
     // Function to handle product selection
     function selectProduct(product) {
         let productInput = document.getElementById("product");
-        productInput.value = product.name+'('+product.rem_qty+')'; // Fill input field
+        productInput.value = product.name + '(' + product.rem_qty + ')'; // Fill input field
         document.getElementById("results").style.display = "none"; // Hide suggestions
     }
 
@@ -286,7 +460,7 @@
         let userInput = document.getElementById("user");
         userInput.value = user.name; // Fill input field
         document.getElementById("userId").value = user.userId; // Set userId value
-        document.getElementById("group_name").innerHTML = 'Groups: '+user.groups.map(item => item.name).join(', ');
+        document.getElementById("group_name").innerHTML = 'Groups: ' + user.groups.map(item => item.name).join(', ');
         document.getElementById("results1").style.display = "none"; // Hide suggestions
     }
 
@@ -319,12 +493,12 @@
                 return;
             }
 
-            if(!userId) {
+            if (!userId) {
                 toastr.error('Select User.')
                 return;
             }
 
-            if(!quantity) {
+            if (!quantity) {
                 toastr.error('Select Quantity');
                 return;
             }
@@ -376,7 +550,6 @@
                     $('#user').prop('disabled', true);
 
                     updateCartUI(cart);
-                    $('#create_order').show();
                 },
                 error: function(xhr) {
                     console.log(xhr.responseJSON.error);
@@ -541,9 +714,14 @@
             },
             success: function(response) {
                 if (response.success) {
-                    window.location.href = `/admin/orders/edit/${response.orderId}`;
+                    $('#orderId').val(response.orderId);
+
+                    if ($('#orderId').val() == response.orderId) {
+                        $('#other_details_form').submit();
+                    }
                 }
             },
+
             error: function(xhr) {
                 console.log(xhr.responseText);
                 toastr.error('Something went wrong. Please try again.');
@@ -552,6 +730,6 @@
     }
 
     // Trigger the function when clicking "Checkout" or similar button
-    $('.btn-submit').on('click', sendCartData);
+    $('.final-submit').on('click', sendCartData);
 </script>
 @endsection

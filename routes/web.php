@@ -91,6 +91,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/orders/add/{id}', [OrdersController::class, 'storeUpdate'])->name('admin.orders.storeUpdate');
         Route::get('/orders/edit/{id}', [OrdersController::class, 'edit'])->name('admin.orders.edit');
         Route::put('/orders/update/{id}', [OrdersController::class, 'update'])->name('admin.orders.update');
+        Route::post('/orders/other-details', [OrdersController::class, 'createOtherDetails'])->name('admin.orders.createOtherDetails');
         Route::delete('/orders/destroy/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
         Route::get('/orders/view/{id}', [OrdersController::class, 'view'])->name('admin.orders.view');
 
