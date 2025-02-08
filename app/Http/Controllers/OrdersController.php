@@ -292,8 +292,8 @@ class OrdersController extends Controller
 
                 // Calculate total price for this product and update totalPrice
                 $productTotalPrice = $unitPrice * $quantity;
-                $totalPrice += $productTotalPrice;
-                $totalQty += $quantity;
+                $totalPrice += (int)$orderProduct['totalPrice'];
+                $totalQty += (int)$orderProduct['quantity'];
 
                 //For order
                 $orderTotal += $productTotalPrice;
@@ -322,15 +322,6 @@ class OrdersController extends Controller
                     ]);
                 }
 
-                //Updating Order data
-                $order = Order::find($id);
-                $oldQty = $order->quantity;
-                $oldTotalPrice = $order->total_amount;
-    
-                $order->quantity = $oldQty + $orderQty;
-                $order->total_amount = $oldTotalPrice + $orderTotal;
-                $order->update();
-
                 //Updating Product Data
                 $product = Product::find($orderProduct['productId']);
                 $usedQty = (int)$product->used_qty;
@@ -342,6 +333,16 @@ class OrdersController extends Controller
                 $product->rem_qty = $remQty;
                 $product->update();
             }
+
+            //Updating Order data
+            $order = Order::find($id);
+            $oldQty = $order->quantity;
+            $oldTotalPrice = $order->total_amount;
+
+            $order->quantity = $oldQty + $orderQty;
+            $order->total_amount = $oldTotalPrice + $orderTotal;
+            $order->update();
+            
             Cart::truncate();
 
             return response()->json([
