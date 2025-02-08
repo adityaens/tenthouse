@@ -294,8 +294,10 @@ class OrdersController extends Controller
                 $productTotalPrice = $unitPrice * $quantity;
                 $totalPrice += $productTotalPrice;
                 $totalQty += $quantity;
-                $orderTotal += $totalPrice;
-                $orderQty += $totalQty;
+
+                //For order
+                $orderTotal += $productTotalPrice;
+                $orderQty += $quantity;
 
                 $orderProductDb = OrderProduct::where([
                     'order_id' => $id,
@@ -320,6 +322,7 @@ class OrdersController extends Controller
                     ]);
                 }
 
+                //Updating Order data
                 $order = Order::find($id);
                 $oldQty = $order->quantity;
                 $oldTotalPrice = $order->total_amount;
@@ -328,6 +331,7 @@ class OrdersController extends Controller
                 $order->total_amount = $oldTotalPrice + $orderTotal;
                 $order->update();
 
+                //Updating Product Data
                 $product = Product::find($orderProduct['productId']);
                 $usedQty = (int)$product->used_qty;
                 $usedQty += $quantity;
