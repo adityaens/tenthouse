@@ -140,7 +140,7 @@ class CustomerController extends Controller
             ->with('groups')
             ->where('status', ACTIVE)
             ->where('roleId', CUSTOMER)
-            ->where('name', 'like', $customerKeyword .'%')
+            ->where('name', 'like', '%'. $customerKeyword .'%')
             ->get();
 
             return response()->json([

@@ -342,7 +342,7 @@ class ProductController extends Controller
                 'rem_qty'
             ])
             ->where('status', ACTIVE)
-            ->where('name', 'like', $productKeyword .'%')
+            ->where('name', 'like', '%'. $productKeyword .'%')
             ->get();
 
             return response()->json([
