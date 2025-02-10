@@ -22,7 +22,7 @@ class OrderRequest extends FormRequest
      * @return array<string, mixed>
      */
     public function rules()
-    {
+    { 
         $rules = [
             'payment_method' => 'required|numeric',
             'booking_date_range' => 'required',
@@ -31,7 +31,7 @@ class OrderRequest extends FormRequest
             'due_date' => 'required',
             'status' => 'required|numeric',
             'delivered_by' => 'required|string',
-        ];
+        ]; 
 
         return $rules;
     }
