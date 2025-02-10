@@ -530,26 +530,30 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                 },
                 success: function(response) {
-                    cart.push({
-                        id: response.cart.id,
-                        name: response.cart.product.name,
-                        productId: response.cart.product.id,
-                        sku: response.cart.product.sku,
-                        unitPrice: response.cart.product.price,
-                        quantity: response.cart.quantity,
-                        totalPrice: response.price
-                    });
+                    if(response.success) {
+                        cart.push({
+                            id: response.cart.id,
+                            name: response.cart.product.name,
+                            productId: response.cart.product.id,
+                            sku: response.cart.product.sku,
+                            unitPrice: response.cart.product.price,
+                            quantity: response.cart.quantity,
+                            totalPrice: response.price
+                        });
 
-                    if (debugMode) {
-                        console.log(cart);
-                        debugger;
+                        if (debugMode) {
+                            console.log(cart);
+                            debugger;
+                        }
+
+                        if ($('#cart_list tr').data('id') == response.cart.id) return;
+
+                        $('#user').prop('disabled', true);
+
+                        updateCartUI(cart);
+                    } else {
+                        toastr.error(response.error);
                     }
-
-                    if ($('#cart_list tr').data('id') == response.cart.id) return;
-
-                    $('#user').prop('disabled', true);
-
-                    updateCartUI(cart);
                 },
                 error: function(xhr) {
                     console.log(xhr.responseJSON.error);

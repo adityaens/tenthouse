@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,6 +27,15 @@ class CartController extends Controller
         $productId = $request->productId;
         $quantity = $request->quantity;
 
+        $product = Product::find($productId);
+        $remQty = $product->rem_qty ?? 0;
+        if($remQty == 0 || $remQty < $quantity) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Product NOT available'
+            ], 206);
+        }
+
         // Check if the product already exists in the cart for this user
         $cart = Cart::where('user_id', $userId)->where('product_id', $productId)->first();
 
@@ -46,6 +56,7 @@ class CartController extends Controller
         $cart = Cart::with(['product', 'user'])->find($cart->id);
 
         return response()->json([
+            'success' => true,
             'message' => $cart->wasRecentlyCreated ? 'Product added to cart' : 'Cart updated successfully',
             'cart' => $cart,
             'price' => $cart->price
