@@ -142,7 +142,7 @@
                                                 </thead>
                                                 <tbody>
                                                     @forelse ($order->orderProducts as $op)
-                                                    <tr>
+                                                    <tr class="cart_row">
                                                         <td>{{ $op->product_name ?? '' }}</td>
                                                         <td>{{ $op->sku ?? '' }}</td>
                                                         <td>{{ $op->unit_price ?? '' }}</td>
@@ -150,10 +150,8 @@
                                                         <td>{{ $op->total_price ?? '' }}</td>
                                                         <td>
                                                             <!-- Delete Button -->
-                                                            <form id="delete-form-{{ $op->id }}" action="{{ route('admin.orders.removeProduct', ['id' => $op->id, 'order_id'=> $op->order_id]) }}" method="POST" style="display: inline-block;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $op->id }})">
+                                                            <form id="delete-form-{{ $op->id }}" style="display: inline-block;">
+                                                                <button type="button" class="btn btn-sm btn-danger delete-cart-btn" data-id="{{ $op->id }}">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </form>
@@ -168,8 +166,8 @@
                                                         <td></td>
                                                         <td></td>
                                                         <td></td>
-                                                        <td>Total Qty: {{$order->quantity}}</td>
-                                                        <td>Total Price: {{CURRENCY_SYMBOL}}{{$order->total_amount}}</td>
+                                                        <td class="total_qty_box">Total Qty: {{$order->quantity}}</td>
+                                                        <td class="total_price_box">Total Price: {{CURRENCY_SYMBOL}}{{$order->total_amount}}</td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -788,7 +786,14 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(groupId) {
+    $(document).ready(function() {
+        $('.delete-cart-btn').on('click', function() {
+            let orderProductId = $(this).data('id');
+            confirmDelete(orderProductId);
+        });
+    })
+
+    function confirmDelete(orderProductId) {
         Swal.fire({
             title: 'Are you sure?',
             text: "This action cannot be undone!",
@@ -806,25 +811,35 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: '{{ route("admin.orders.removeProduct", ["id" => $order->id]) }}', 
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#other_details_form').submit();
-                        }
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
-                        toastr.error('Something went wrong. Please try again.');
-                    }
-                });
+                deleteCart(orderProductId);
+            }
+        });
+    }
+
+    function deleteCart(orderProductId) {
+        $.ajax({
+            url: '{{ route("admin.orders.removeProduct") }}',
+            type: 'POST',
+            data: {
+                orderProductId: orderProductId,
+                _token: $('meta[name="csrf-token"]').attr("content")
+            },
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message || "Product removed successfully.");
+                    $(`.delete-cart-btn[data-id="${orderProductId}"]`).closest('.cart_row').remove();
+                    $('.total_price_box').text(`Total Price: ₹${response.order.total_amount}`);
+                    $('.total_qty_box').text(`Total Qty: ${response.order.quantity}`);
+                } else {
+                    toastr.error(response.message || "An error occurred.");
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+                toastr.error('Something went wrong. Please try again.');
             }
         });
     }

@@ -94,7 +94,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/orders/other-details', [OrdersController::class, 'createOtherDetails'])->name('admin.orders.createOtherDetails');
         Route::delete('/orders/destroy/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
         Route::get('/orders/view/{id}', [OrdersController::class, 'view'])->name('admin.orders.view');
-        Route::delete('/orders/remove-product/{id}', [OrdersController::class, 'removeProduct'])->name('admin.orders.removeProduct');
+        Route::post('/orders/remove-product', [OrdersController::class, 'removeProduct'])->name('admin.orders.removeProduct');
 
         //Cart
         Route::post('/carts/add', [CartController::class, 'addToCart'])->name('admin.carts.addToCart');

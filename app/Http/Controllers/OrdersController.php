@@ -168,9 +168,7 @@ class OrdersController extends Controller
 
         $order = Order::with('orderProducts', 'user')
             ->where('id', $id)
-            ->first();
-
-;
+            ->first();;
         return view('admin.orders.createUpdate', [
             'order' => $order,
             'customers' => $customers,
@@ -342,7 +340,7 @@ class OrdersController extends Controller
             $order->quantity = $oldQty + $orderQty;
             $order->total_amount = $oldTotalPrice + $orderTotal;
             $order->update();
-            
+
             Cart::truncate();
 
             return response()->json([
@@ -655,15 +653,53 @@ class OrdersController extends Controller
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
         }
     }
-    public function removeProduct($id){
-        $product=OrderProduct::find($id);
-        $productDetails=Product::find($product->product_id);
-        $productDetails->used_qty -= $product->quantity;        
-        $productDetails->rem_qty += $product->quantity;
-        $productDetails->update();
-        
-        if($product->delete()){
-            return redirect()->route('admin.orders.index')->with('success', 'Order modified successfully.');
+
+    public function removeProduct(Request $request)
+    {
+        $id = $request->input('orderProductId');
+        try {
+            if (!empty($id)) {
+                $product = OrderProduct::find($id);
+                if (!$product) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => showErrorMessage($this->debugMode, 'Item NOT found.')
+                    ]);
+                }
+
+                $order = Order::find($product->order_id);
+                $order->total_amount -= $product->total_price;
+                $order->quantity -= $product->quantity;
+                $order->update();
+
+                $productDetails = Product::find($product->product_id);
+                $productDetails->used_qty -= $product->quantity;
+                $productDetails->rem_qty += $product->quantity;
+                $productDetails->update();
+
+                if ($product->delete()) {
+                    return response()->json([
+                        'success' => true,
+                        'order' => $order,
+                        'message' => 'Item removed from cart.'
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'error' => showErrorMessage($this->debugMode, 'Item NOT deleted.')
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'Item NOT found.')
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => showErrorMessage($this->debugMode, $e->getMessage())
+            ]);
         }
     }
 }
