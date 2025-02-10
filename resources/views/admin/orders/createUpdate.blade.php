@@ -43,6 +43,27 @@
         margin-bottom: 5px;
         border-radius: 5px;
     }
+
+    .small-swal {
+        max-width: 350px !important;
+        padding: 1rem !important;
+    }
+
+    .small-swal-title {
+        font-size: 16px !important;
+        /* Adjust title font size */
+    }
+
+    .small-swal-content {
+        font-size: 14px !important;
+        /* Adjust content font size */
+    }
+
+    .small-swal-actions .swal2-confirm,
+    .small-swal-actions .swal2-cancel {
+        font-size: 14px !important;
+        /* Adjust button font size */
+    }
 </style>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -115,6 +136,8 @@
                                                         <th>Unit Price</th>
                                                         <th>Qty</th>
                                                         <th>Price</th>
+                                                        <th>Action</th>
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -125,6 +148,16 @@
                                                         <td>{{ $op->unit_price ?? '' }}</td>
                                                         <td>{{ $op->quantity ?? '' }}</td>
                                                         <td>{{ $op->total_price ?? '' }}</td>
+                                                        <td>
+                                                            <!-- Delete Button -->
+                                                            <form id="delete-form-{{ $op->id }}" action="{{ route('admin.orders.removeProduct', ['id' => $op->id, 'order_id'=> $op->order_id]) }}" method="POST" style="display: inline-block;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $op->id }})">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
                                                     </tr>
                                                     @empty
 
@@ -752,5 +785,48 @@
 
     // Trigger the function when clicking "Checkout" or similar button
     $('.other-details-btn').on('click', sendCartData);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(groupId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'small-swal',
+                title: 'small-swal-title',
+                content: 'small-swal-content',
+                actions: 'small-swal-actions'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.orders.removeProduct", ["id" => $order->id]) }}', 
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#other_details_form').submit();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                        toastr.error('Something went wrong. Please try again.');
+                    }
+                });
+            }
+        });
+    }
 </script>
 @endsection

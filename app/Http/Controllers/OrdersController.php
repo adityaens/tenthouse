@@ -170,7 +170,7 @@ class OrdersController extends Controller
             ->where('id', $id)
             ->first();
 
-
+;
         return view('admin.orders.createUpdate', [
             'order' => $order,
             'customers' => $customers,
@@ -653,6 +653,17 @@ class OrdersController extends Controller
             return redirect()->route('admin.orders.index')->with('success', 'Order modified successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', showErrorMessage($this->debugMode, $e->getMessage()));
+        }
+    }
+    public function removeProduct($id){
+        $product=OrderProduct::find($id);
+        $productDetails=Product::find($product->product_id);
+        $productDetails->used_qty -= $product->quantity;        
+        $productDetails->rem_qty += $product->quantity;
+        $productDetails->update();
+        
+        if($product->delete()){
+            return redirect()->route('admin.orders.index')->with('success', 'Order modified successfully.');
         }
     }
 }

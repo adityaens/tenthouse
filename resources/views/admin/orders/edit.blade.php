@@ -202,7 +202,7 @@
                 format: 'YYYY-MM-DD'
             }
         });
-
+ 
         $('#due_date').datetimepicker({
             format: 'YYYY-MM-DD',
             icons: {
