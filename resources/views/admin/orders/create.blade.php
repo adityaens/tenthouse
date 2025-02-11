@@ -530,7 +530,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                 },
                 success: function(response) {
-                    if(response.success) {
+                    if (response.success) {
                         cart.push({
                             id: response.cart.id,
                             name: response.cart.product.name,
@@ -591,8 +591,8 @@
                 </td>
                 <td class="total-price">₹${item.totalPrice}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm remove-item" data-index="${index}">
-                        <i class="fas fa-trash"></i> Remove
+                    <button class="btn btn-danger btn-sm remove-item" data-index="${index}" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>    
             </tr>
@@ -660,7 +660,19 @@
 
         // Listen for item removal
         $(document).on('click', '.remove-item', function() {
+            let cartId = $(this).data('id');
+            if (debugMode) {
+                console.log(cartId);
+                debugger;
+            }
             $(this).closest('tr').remove();
+            cart.forEach((item, index) => {
+                if (item.id === cartId) {
+                    cart.splice(index, 1);
+                }
+            });
+
+            deleteFromCart(cartId);
             updateCartTotals(); // Update totals after removal
         });
 
@@ -735,5 +747,27 @@
 
     // Trigger the function when clicking "Checkout" or similar button
     $('.final-submit').on('click', sendCartData);
+
+    function deleteFromCart(cartId) {
+        $.ajax({
+            url: "{{ route('admin.carts.deleteFromCart') }}",
+            type: "POST",
+            data: {
+                cartId: cartId,
+                _token: $('meta[name="csrf-token"]').attr("content")
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success("Order removed from cart.");
+                } else {
+                    toastr.error(response.message || "Order NOT removed.");
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                toastr.error("Something went wrong. Please try again.");
+            }
+        });
+    }
 </script>
 @endsection

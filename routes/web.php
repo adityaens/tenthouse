@@ -98,6 +98,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         //Cart
         Route::post('/carts/add', [CartController::class, 'addToCart'])->name('admin.carts.addToCart');
+        Route::post('/carts/delete', [CartController::class, 'deleteFromCart'])->name('admin.carts.deleteFromCart');
     });
 });
 

@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
+    private $debugMode;
+
+    public function __construct()
+    {
+        $this->debugMode = config('constants.debug_mode');
+    }
+
     public function addToCart(Request $request)
     {
         // Validate the incoming request
@@ -61,5 +69,39 @@ class CartController extends Controller
             'cart' => $cart,
             'price' => $cart->price
         ], 200);
+    }
+
+    public function deleteFromCart(Request $request)
+    {
+        $id = $request->input('cartId');
+        
+        try {
+            if (!empty($id)) {
+                $cart = Cart::find($id);
+                $isDeleted = $cart->delete();
+
+                if ($isDeleted) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Item deleted successfully.'
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'error' => showErrorMessage($this->debugMode, 'Item NOT deleted.')
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => showErrorMessage($this->debugMode, 'Item NOT found in cart.')
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => showErrorMessage($this->debugMode, $e->getMessage())
+            ]);
+        }
     }
 }
