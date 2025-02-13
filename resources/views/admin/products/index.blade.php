@@ -6,15 +6,21 @@
         max-width: 350px !important;
         padding: 1rem !important;
     }
+
     .small-swal-title {
-        font-size: 16px !important; /* Adjust title font size */
+        font-size: 16px !important;
+        /* Adjust title font size */
     }
+
     .small-swal-content {
-        font-size: 14px !important; /* Adjust content font size */
+        font-size: 14px !important;
+        /* Adjust content font size */
     }
+
     .small-swal-actions .swal2-confirm,
     .small-swal-actions .swal2-cancel {
-        font-size: 14px !important; /* Adjust button font size */
+        font-size: 14px !important;
+        /* Adjust button font size */
     }
 </style>
 
@@ -113,6 +119,13 @@
 
                         <hr />
                     </div>
+                    <div class="row justify-content-end mb-2">
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                Import
+                            </button>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -193,7 +206,34 @@
     </div>
     <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
+
+
+<!-- Import Products Modal -->
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Import Products</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="csvFile">
+                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@section('script')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmDelete(productId) {

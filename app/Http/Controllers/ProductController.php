@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 
 
 class ProductController extends Controller
@@ -262,7 +263,7 @@ class ProductController extends Controller
 
             }
             //else {
-            //     return redirect()->back()->with('error', showErrorMessage($this->debugMode, 'No images found'));
+            //     return redirect()->back()->with('error', showEr rorMessage($this->debugMode, 'No images found'));
             // }
 
             if ($isUpdated) {
@@ -356,5 +357,100 @@ class ProductController extends Controller
                 'error' => showErrorMessage($this->debugMode, $e->getMessage())
             ]);
         }
+    }
+
+    /**
+     * Import CSV File for Products
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function import(Request $request)
+    {
+        $response = [];
+        $response['status'] = 0;
+        $httpStatusCode = 206;
+        $insert = [];
+        $error = [];
+
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'file' => 'required|mimes:csv',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['status' => 0, 'error' => $validator->errors()->first()]);
+            }
+
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = $file->getClientOriginalName();
+                $fileExtension = $file->getClientOriginalExtension();
+
+                $headers = ['NAME', 'SKU', 'CATEGORY', 'DESCRIPTION', 'PRICE', 'QUANTITY', 'PRODUCT_CONDITION', 'STATUS'];
+                $csvHeaders = fgetcsv(fopen($file->getPathname(), 'r'));
+
+                if ($csvHeaders !== $headers && array_intersect_assoc($csvHeaders, $headers) === $headers) {
+                    return response()->json(['status' => 0, 'error' => 'Invalid CSV file.']);
+                }
+                $csvData = array_map('str_getcsv', file($file));
+
+                $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME); 
+                $fileExtension = $file->getClientOriginalExtension();
+                $uniqueId = time() . '_' . uniqid();
+                $fileName = $originalFileName . '_' . $uniqueId . '.' . $fileExtension;
+                $destinationPath = public_path('uploads/csv');
+                
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+
+                $file->move($destinationPath, $fileName);
+
+                foreach ($csvData as $index => $row) {
+                    if ($index === 0) continue;
+
+                    if (empty($row[0]) && empty($row[1]) && empty($row[2]) && empty($row[3]) && empty($row[4]) && !isset($row[5]) && !isset($row[6]) && !isset($row[7])) {
+                        $error[] = $row;
+                        continue;  
+                    } 
+                    
+                    $category = ProductCategory::where('name', 'like', trim($row[2]))->first();
+                    $catId = !empty($category->id) ? $category->id : '';
+
+                    if(empty($catId)) {
+                        $error[] = $row;
+                        continue;
+                    }
+
+                    $insert['name'] = trim($row[0]);
+                    $insert['sku'] = trim($row[1]) ?? '';
+                    $insert['user_id'] = auth()->user()->userId;
+                    $insert['cat_id'] = $catId;
+                    $insert['description'] = trim($row[3]);
+                    $insert['price'] = trim($row[4]);
+                    $insert['quantity'] = trim($row[5]);
+                    $insert['product_condition'] = trim($row[6]);
+                    $insert['status'] = (trim($row[6]) == 'Active') ? 1 : 0;
+                    
+                    Product::updateOrCreate([
+                        'sku' => trim($row[1])
+                    ], $insert);
+                }
+                DB::commit();
+                
+                $response['status'] = 1;
+                $response['message'] = 'Products imported successfully.';
+                $response['file_details'] = ['name' => $fileName, 'extension' => $fileExtension];
+                $httpStatusCode = 200;
+            } else {
+                DB::rollback();
+                $response['error'] = 'No File to upload.';
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            $response['error'] = $e->getMessage();
+        }
+        return response()->json($response, $httpStatusCode);
     }
 }
