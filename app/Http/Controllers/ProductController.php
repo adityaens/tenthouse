@@ -6,11 +6,14 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Http\Requests\ProductRequest;
+use App\Models\ProductsError;
 use App\Models\ProductLog;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -296,14 +299,13 @@ class ProductController extends Controller
                     }
                 }
             }
-        $product = Product::find($id);
-        if ($product) {
-            $this->product_logs($product->id, 'delete', $product->toArray(), null, 'Product deleted successfully.');
-            ProductImage::where('product_id', $id)->delete();
-            $product->delete();
- 
-        }
-            
+            $product = Product::find($id);
+            if ($product) {
+                $this->product_logs($product->id, 'delete', $product->toArray(), null, 'Product deleted successfully.');
+                ProductImage::where('product_id', $id)->delete();
+                $product->delete();
+            }
+
             return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully');
         } else {
             return redirect()->route('admin.products.index')->with('error', 'Product not found');
@@ -330,7 +332,7 @@ class ProductController extends Controller
         $productKeyword = $request->input('productKeyword');
         try {
 
-            if(empty($productKeyword)) {
+            if (empty($productKeyword)) {
                 return response()->json([
                     'success' => false,
                     'error' => showErrorMessage($this->debugMode, 'Nothing to search.')
@@ -342,15 +344,14 @@ class ProductController extends Controller
                 'name',
                 'rem_qty'
             ])
-            ->where('status', ACTIVE)
-            ->where('name', 'like', '%'. $productKeyword .'%')
-            ->get();
+                ->where('status', ACTIVE)
+                ->where('name', 'like', '%' . $productKeyword . '%')
+                ->get();
 
             return response()->json([
                 'success' => true,
                 'products' => $products
             ]);
-
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -366,91 +367,97 @@ class ProductController extends Controller
      */
     public function import(Request $request)
     {
-        $response = [];
-        $response['status'] = 0;
+        $response = [
+            'status' => 0,
+            'error' => '',
+        ];
         $httpStatusCode = 206;
         $insert = [];
-        $error = [];
+        $errorEntries = []; // Store error records separately
 
-        DB::beginTransaction();
         try {
             $validator = Validator::make($request->all(), [
-                'file' => 'required|mimes:csv',
+                'csvFile' => 'required|mimes:csv',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['status' => 0, 'error' => $validator->errors()->first()]);
             }
 
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $fileName = $file->getClientOriginalName();
-                $fileExtension = $file->getClientOriginalExtension();
+            if ($request->hasFile('csvFile')) {
+                $file = $request->file('csvFile');
+                $csvData = array_map('str_getcsv', file($file->getPathname()));
 
-                $headers = ['NAME', 'SKU', 'CATEGORY', 'DESCRIPTION', 'PRICE', 'QUANTITY', 'PRODUCT_CONDITION', 'STATUS'];
-                $csvHeaders = fgetcsv(fopen($file->getPathname(), 'r'));
-
-                if ($csvHeaders !== $headers && array_intersect_assoc($csvHeaders, $headers) === $headers) {
-                    return response()->json(['status' => 0, 'error' => 'Invalid CSV file.']);
-                }
-                $csvData = array_map('str_getcsv', file($file));
-
-                $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME); 
-                $fileExtension = $file->getClientOriginalExtension();
-                $uniqueId = time() . '_' . uniqid();
-                $fileName = $originalFileName . '_' . $uniqueId . '.' . $fileExtension;
-                $destinationPath = public_path('uploads/csv');
-                
-                if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0755, true);
-                }
-
-                $file->move($destinationPath, $fileName);
+                DB::beginTransaction(); // Start transaction for product inserts
 
                 foreach ($csvData as $index => $row) {
-                    if ($index === 0) continue;
+                    if ($index === 0) continue; // Skip headers
 
-                    if (empty($row[0]) && empty($row[1]) && empty($row[2]) && empty($row[3]) && empty($row[4]) && !isset($row[5]) && !isset($row[6]) && !isset($row[7])) {
-                        $error[] = $row;
-                        continue;  
-                    } 
-                    
-                    $category = ProductCategory::where('name', 'like', trim($row[2]))->first();
-                    $catId = !empty($category->id) ? $category->id : '';
+                    $category = ProductCategory::where('name', 'like', trim($row[1]))->first();
+                    $catId = !empty($category->id) ? $category->id : null;
 
-                    if(empty($catId)) {
-                        $error[] = $row;
+                    // Validation: If required fields are missing or category is invalid
+                    if (empty($row[0]) || empty($row[1]) || empty($row[2]) || empty($row[3]) || empty($row[4]) || !isset($row[5]) || !isset($row[6]) || empty($catId)) {
+                        $errorEntries[] = $this->prepareErrorData($row, $catId);
                         continue;
                     }
 
-                    $insert['name'] = trim($row[0]);
-                    $insert['sku'] = trim($row[1]) ?? '';
-                    $insert['user_id'] = auth()->user()->userId;
-                    $insert['cat_id'] = $catId;
-                    $insert['description'] = trim($row[3]);
-                    $insert['price'] = trim($row[4]);
-                    $insert['quantity'] = trim($row[5]);
-                    $insert['product_condition'] = trim($row[6]);
-                    $insert['status'] = (trim($row[6]) == 'Active') ? 1 : 0;
-                    
-                    Product::updateOrCreate([
-                        'sku' => trim($row[1])
-                    ], $insert);
+                    // Prepare Product Data
+                    $insert[] = [
+                        'name' => trim($row[0]),
+                        'user_id' => auth()->user()->userId,
+                        'cat_id' => $catId,
+                        'description' => trim($row[2]),
+                        'price' => trim($row[3]),
+                        'quantity' => trim($row[4]),
+                        'product_condition' => trim($row[5]),
+                        'status' => (trim($row[6]) == 'Active') ? 1 : 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
                 }
-                DB::commit();
-                
-                $response['status'] = 1;
-                $response['message'] = 'Products imported successfully.';
-                $response['file_details'] = ['name' => $fileName, 'extension' => $fileExtension];
-                $httpStatusCode = 200;
+
+                if (!empty($errorEntries)) {
+                    // Rollback product insertion
+                    DB::rollback();
+
+                    // Insert errors into the products_errors table outside the transaction
+                    ProductsError::insert($errorEntries);
+
+                    $response['error'] = 'Errors found. Products not imported.';
+                } else {
+                    // Insert all products and commit transaction if no errors
+                    Product::insert($insert);
+                    DB::commit();
+
+                    $response['status'] = 1;
+                    $response['message'] = 'Products imported successfully.';
+                    $httpStatusCode = 200;
+                }
             } else {
-                DB::rollback();
-                $response['error'] = 'No File to upload.';
+                $response['error'] = 'No file to upload.';
             }
-        } catch (\Exception $e) {
-            DB::rollback();
+        } catch (Exception $e) {
+            DB::rollback(); // Rollback all product inserts on any exception
             $response['error'] = $e->getMessage();
         }
+
         return response()->json($response, $httpStatusCode);
+    }
+
+
+
+    private function prepareErrorData($row, $catId)
+    {
+        $error = [];
+        $error['name'] = trim($row[0]);
+        $error['user_id'] = auth()->user()->userId;
+        $error['cat_id'] = $catId;
+        $error['description'] = trim($row[2]);
+        $error['price'] = trim($row[3]);
+        $error['quantity'] = trim($row[4]);
+        $error['product_condition'] = trim($row[5]);
+        $error['status'] = (trim($row[6]) == 'Active') ? 1 : 0;
+        return $error;
     }
 }
