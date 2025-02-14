@@ -280,21 +280,36 @@
                 data: formData,
                 contentType: false,
                 processData: false,
-                before: function() {
-                    element.removeClass('btn-warning').addClass('btn-info').text('<i class="fa-solid fa-gear fa-shake"></i>');
+                beforeSend: function() {
+                    element.removeClass('btn-warning').addClass('btn-info').html('<i class="fa-solid fa-gear fa-shake"></i> Wait..');
                 },
                 success: function(response) {
                     element.removeClass('btn-info').addClass('btn-warning').text('Import');
                     if (response.status == 1) {
-                        $('#staticBackdrop').hide();
-                        Swal.fire({
-                            title: 'success',
-                            text: "Products imported successfully.",
-                            icon: 'success'
-                        }).then(() => {
-                            location.reload();
-                        });
+                       setTimeout(() => {
+                            $('#staticBackdrop').hide();
+                            Swal.fire({
+                                title: 'success',
+                                text: "Products imported successfully.",
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                       }, 1000);
                     } else {
+                        setTimeout(() => {
+                            Swal.fire({
+                                title: 'Oops!',
+                                text: "An error occured.",
+                                icon: 'error'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }, 2000);
+                    }
+                },
+                error: function(xhr) {
+                    setTimeout(() => {
                         Swal.fire({
                             title: 'Oops!',
                             text: "An error occured.",
@@ -302,16 +317,7 @@
                         }).then(() => {
                             location.reload();
                         });
-                    }
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        title: 'Oops!',
-                        text: "An error occured.",
-                        icon: 'error'
-                    }).then(() => {
-                        location.reload();
-                    });
+                    }, 2000);
                 }
             });
         });
