@@ -52,8 +52,6 @@ class Product extends Model
     // Generate a unique SKU
     public static function generateSKU($product)
     {
-
         return strtoupper(Str::random(3)) . '-' . strtoupper(Str::random(4)) . '-' . Str::random(3);
-       
     }
 }

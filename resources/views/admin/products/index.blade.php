@@ -217,15 +217,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="csvFile" class="form-label">Choose file</label>
-                        <input type="file" class="form-control" id="csvFile">
+
+                <form id="import-form" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="csvFile" name="csvFile">
+                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning" id="importBtn">Import</button>
+ 
+                <button type="button" class="btn btn-warning import-btn">Import</button>
+
             </div>
         </div>
     </div>
@@ -257,6 +263,70 @@
             }
         });
     }
+
+    //For showing selected file input
+    document.getElementById('csvFile').addEventListener('change', function(event) {
+        let fileName = event.target.files[0] ? event.target.files[0].name : "Choose file";
+        this.nextElementSibling.innerText = fileName;
+    });
+
+    //Importing CSV File
+    $(document).ready(function() {
+        $('.import-btn').click(function(event) {
+            let element = $(this);
+            event.preventDefault();
+
+            let formData = new FormData($('#import-form')[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: "{{ route('admin.products.import') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    element.removeClass('btn-warning').addClass('btn-info').html('<i class="fa-solid fa-gear fa-shake"></i> Wait..');
+                },
+                success: function(response) {
+                    element.removeClass('btn-info').addClass('btn-warning').text('Import');
+                    if (response.status == 1) {
+                       setTimeout(() => {
+                            $('#staticBackdrop').hide();
+                            Swal.fire({
+                                title: 'success',
+                                text: "Products imported successfully.",
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                       }, 1000);
+                    } else {
+                        setTimeout(() => {
+                            Swal.fire({
+                                title: 'Oops!',
+                                text: "An error occured.",
+                                icon: 'error'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }, 2000);
+                    }
+                },
+                error: function(xhr) {
+                    setTimeout(() => {
+                        Swal.fire({
+                            title: 'Oops!',
+                            text: "An error occured.",
+                            icon: 'error'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }, 2000);
+                }
+            });
+        });
+    });
 </script>
 <script>
     $(document).ready(function() {
