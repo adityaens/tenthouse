@@ -240,7 +240,7 @@ class ProductController extends Controller
                         }
                     }
                 }
-
+ 
 
                 $deleteOldImages = ProductImage::where('product_id', $id)->delete();
 
@@ -366,6 +366,7 @@ class ProductController extends Controller
      */
     public function import(Request $request)
     {
+        dd('testing');
         $response = [];
         $response['status'] = 0;
         $httpStatusCode = 206;

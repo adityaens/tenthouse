@@ -218,20 +218,19 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="csvFile">
-                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                        </div>
+                    <div class="mb-3">
+                        <label for="csvFile" class="form-label">Choose file</label>
+                        <input type="file" class="form-control" id="csvFile">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning">Import</button>
+                <button type="button" class="btn btn-warning" id="importBtn">Import</button>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -258,6 +257,37 @@
             }
         });
     }
+</script>
+<script>
+    $(document).ready(function() {
+        $('#importBtn').click(function() {
+            alert('testing');
+            let formData = new FormData();
+            let file = $('#csvFile')[0].files[0];
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+            formData.append('csv_file', file);
+            formData.append('_token', '{{csrf_token()}}');
+
+            $.ajax({
+                url: '{{ route ("admin.products.import")}}',
+                type: 'POST',
+                data: formData,
+                contentType: false, // Prevent jQuery from setting content type
+                processData: false, // Prevent jQuery from processing FormData
+
+                success: function(response) {
+                    alert(response.message);
+                    console.log(response);
+                },
+                error: function(xhr) {
+                    alert('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+    });
 </script>
 
 @endsection

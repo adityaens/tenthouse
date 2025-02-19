@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/products/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::post('/products/list', [ProductController::class, 'getProductsList'])->name('admin.products.getProductsList');
+        Route::post('/products/import', [ProductController::class, 'import'])->name('admin.products.import');
 
 
         //Group
