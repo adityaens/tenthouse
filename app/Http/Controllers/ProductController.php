@@ -6,81 +6,41 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Http\Requests\ProductRequest;
+use App\Jobs\ProductExportJob;
 use App\Models\ProductsError;
 use App\Models\ProductLog;
+use App\Services\ProductService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProductController extends Controller
 {
     private $debugMode;
+    private $productService;
 
-    public function __construct()
+    public function __construct(ProductService $productService)
     {
         $this->debugMode = config('constants.debug_mode');
+        $this->productService = $productService;
     }
 
     public function index(Request $request)
     {
-        $searchName = $request->get('name', NULL);
-        $searchCatId = $request->get('cat_id', NULL);
-        $searchStatus = $request->get('status', NULL);
-        $searchCreatedAt = $request->get('created_at', NULL);
-
         $productCategories = ProductCategory::select([
             'id',
             'name'
         ])
             ->get();
 
-        $query = Product::select([
-            'id',
-            'name',
-            'user_id',
-            'cat_id',
-            'price',
-            'quantity',
-            'status',
-            'created_at'
-        ]);
-
-        // Apply filters conditionally
-        if (!empty($searchName)) {
-            $query->where('name', 'like', '%' . $searchName . '%');
-        }
-
-        if (!empty($searchCatId)) {
-            $query->where('cat_id', $searchCatId);
-        }
-
-        if (isset($searchStatus)) {
-            $query->where('status', $searchStatus);
-        }
-
-        if (!empty($searchCreatedAt)) {
-            $query->whereDate('created_at', $searchCreatedAt);
-        }
-
-        // Add relationships
-        $query->with('user', function ($query) {
-            $query->select('userId', 'name');
-        });
-
-        $query->with('images', function ($query) {
-            $query->select('product_id', 'image_path');
-        });
-
-        $query->with('category', function ($query) {
-            $query->select('id', 'name');
-        });
-
-        $products = $query->orderBy('id', 'DESC')->paginate(PER_PAGE);
+        $products = $this->productService->getProducts($request);
 
         return view('admin.products.index', [
             'products' => $products,
@@ -459,5 +419,25 @@ class ProductController extends Controller
         $error['product_condition'] = trim($row[5]);
         $error['status'] = (trim($row[6]) == 'Active') ? 1 : 0;
         return $error;
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $result = '';
+            $batch = Bus::batch([])->dispatch();
+            $fileName = 'products-list-' . time() . '.xlsx';
+            $batch->add(new ProductExportJob($request, $batch->id, $fileName));
+            $result = [
+                'batch' => $batch,
+                'filename' => $fileName
+            ];
+            if ($result) {
+                return $this->successResponse([], $result, Response::HTTP_OK);
+            }
+            return $this->errorResponse('Exporting failed', Response::HTTP_OK);
+        } catch (Exception $e) {
+            throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY, $e->getMessage());
+        }
     }
 }
