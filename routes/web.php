@@ -60,6 +60,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::post('/products/list', [ProductController::class, 'getProductsList'])->name('admin.products.getProductsList');
         Route::post('/products/import', [ProductController::class, 'import'])->name('admin.products.import');
+        Route::post('/products/export', [ProductController::class, 'export'])->name('admin.products.export');
 
 
         //Group

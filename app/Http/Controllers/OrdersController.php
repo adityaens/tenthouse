@@ -189,6 +189,8 @@ class OrdersController extends Controller
             $totalPrice = 0;
             $totalQty = 0;
             $userId = $request->input('userId');
+
+            // No customer selected
             if (!$request->has('userId')) {
                 return response()->json([
                     'success' => false,
@@ -196,8 +198,10 @@ class OrdersController extends Controller
                 ]);
             }
 
+            // Items added in the cart
             $orderProducts = json_decode($request->input('cartItems'), true);
 
+            // Create order
             $order = Order::create([
                 'order_id' => $this->generateUniqueOrderId(),
                 'user_id' => $userId
@@ -234,10 +238,14 @@ class OrdersController extends Controller
                     $product->rem_qty = $remQty;
                     $product->update();
                 }
+
+                // Update total price, qty for the order
                 $order->total_amount = $totalPrice;
                 $order->quantity = $totalQty;
                 $order->update();
-                Cart::truncate();
+
+                // Delete Items from the cart
+                Cart::where('user_id', $userId)->delete();
             } else {
                 return response()->json([
                     'success' => false,
@@ -260,7 +268,7 @@ class OrdersController extends Controller
 
 
     /**
-     * Store Orders 
+     * Update Orders 
      * 
      * @param \App\Http\Requests\OrderRequest;
      * @param int $id;
@@ -320,7 +328,7 @@ class OrdersController extends Controller
                     ]);
                 }
 
-                //Updating Product Data
+                // Update Product Data
                 $product = Product::find($orderProduct['productId']);
                 $usedQty = (int)$product->used_qty;
                 $usedQty += $quantity;
@@ -332,7 +340,7 @@ class OrdersController extends Controller
                 $product->update();
             }
 
-            //Updating Order data
+            // Update Order data
             $order = Order::find($id);
             $oldQty = $order->quantity;
             $oldTotalPrice = $order->total_amount;
@@ -341,7 +349,8 @@ class OrdersController extends Controller
             $order->total_amount = $oldTotalPrice + $orderTotal;
             $order->update();
 
-            Cart::truncate();
+            // Remove item from cart
+            Cart::where('user_id', $userId)->delete();
 
             return response()->json([
                 'success' => true,
